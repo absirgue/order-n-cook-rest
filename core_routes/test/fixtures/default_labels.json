@@ -1,0 +1,16 @@
+[
+    {
+        "model": "core_routes.labels",
+        "pk": 1,
+        "fields": {
+            "name": "AOC"
+        }
+    },
+    {
+        "model": "core_routes.labels",
+        "pk": 2,
+        "fields": {
+            "name": "AOP"
+        }
+    }
+]

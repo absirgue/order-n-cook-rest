@@ -1,0 +1,19 @@
+[
+    {
+        "model": "core_routes.ingredients",
+        "pk": 1,
+        "fields": {
+            "name": "Beurre",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis nec eros in elit lobortis pretium. Pellentesque et est id ante posuere dignissim. Donec viverra gravida felis, vitae dictum augue tincidunt vel. Aenean placerat sem quis est ultrices, sit amet tempor turpis tempus. Pellentesque pulvinar, tellus eget luctus volutpat, ex metus euismod nisl, consectetur pellentesque elit ante in neque. Duis vulputate tortor a nibh vulputate lacinia. Sed aliquam tristique imperdiet.",
+            "illustration": "test/i_am_am_image.png",
+            "labels": [
+                1
+            ],
+            "allergenes": [
+                1
+            ],
+            "conversion_to_kilo": 1.0,
+            "unit": "kilogramme"
+        }
+    }
+]

@@ -1,0 +1,21 @@
+[
+    {
+        "model": "core_routes.ingredients",
+        "pk": 2,
+        "fields": {
+            "name": "Crème",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis nec eros in elit lobortis pretium. Pellentesque et est id ante posuere dignissim. Donec viverra gravida felis, vitae dictum augue tincidunt vel. Aenean placerat sem quis est ultrices, sit amet tempor turpis tempus. Pellentesque pulvinar, tellus eget luctus volutpat, ex metus euismod nisl, consectetur pellentesque elit ante in neque. Duis vulputate tortor a nibh vulputate lacinia. Sed aliquam tristique imperdiet.",
+            "illustration": "test/i_am_am_image_2.png",
+            "labels": [
+                1,
+                2
+            ],
+            "allergenes": [
+                1,
+                2
+            ],
+            "conversion_to_kilo": 0.1,
+            "unit": "cup"
+        }
+    }
+]

@@ -1,0 +1,16 @@
+[
+    {
+        "model": "core_routes.allergenes",
+        "pk": 1,
+        "fields": {
+            "name": "Lactose"
+        }
+    },
+    {
+        "model": "core_routes.allergenes",
+        "pk": 2,
+        "fields": {
+            "name": "Gluten"
+        }
+    }
+]
