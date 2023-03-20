@@ -4,8 +4,8 @@ from django.urls import reverse
 from core_routes.models import Ingredients,Conversions
 
 
-class ConversionAPIViewTest(TestCase):
-    """Tests of the routes associated with an conversions view."""
+class KilogramEquivalentAPIViewTest(TestCase):
+    """Tests of the routes associated with the conversion equivalence view."""
     
     fixtures = ['core_routes/test/fixtures/other_ingredient.json','core_routes/test/fixtures/default_conversions.json','core_routes/test/fixtures/default_labels.json','core_routes/test/fixtures/default_allergenes.json']
 

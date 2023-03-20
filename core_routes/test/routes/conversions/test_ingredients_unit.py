@@ -5,7 +5,7 @@ from core_routes.models import Ingredients,Conversions
 
 
 class IngredientUnitAPIViewTest(TestCase):
-    """Tests of the routes associated with an conversions view."""
+    """Tests of the routes associated with the ingredient unit view."""
     
     fixtures = ['core_routes/test/fixtures/other_ingredient.json','core_routes/test/fixtures/default_conversions.json','core_routes/test/fixtures/default_labels.json','core_routes/test/fixtures/default_allergenes.json','core_routes/test/fixtures/default_ingredient.json']
 
