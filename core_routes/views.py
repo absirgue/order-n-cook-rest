@@ -281,15 +281,18 @@ class IngredientUnits(APIView):
     def get(self,request,ingredientId, format=None):
         if not (ingredientId):
             return Response({'message':'Not enough data provided.'},status=status.HTTP_400_BAD_REQUEST)
-        ingredient = Ingredients.objects.get(id=ingredientId)
-        conversions = [{"unit":"kilogramme","conversion_rate":1}]
-        if ingredient.unit != "kilogramme":
-            conversions.append({"unit":ingredient.unit,"conversion_rate":ingredient.conversion_to_kilo})
-        
         try:
-            recorded_conversions = Conversions.objects.filter(ingredient=ingredient)
-            for conversion in recorded_conversions:
-                conversions.append({"unit":conversion.unit,"conversion_rate":conversion.conversion_to_kilo})
-            return Response({'units':conversions},status=status.HTTP_200_OK)
+            ingredient = Ingredients.objects.get(id=ingredientId)
+            conversions = [{"unit":"kilogramme","conversion_rate":1}]
+            if ingredient.unit != "kilogramme":
+                conversions.append({"unit":ingredient.unit,"conversion_rate":ingredient.conversion_to_kilo})
+            
+            try:
+                recorded_conversions = Conversions.objects.filter(ingredient=ingredient)
+                for conversion in recorded_conversions:
+                    conversions.append({"unit":conversion.unit,"conversion_rate":conversion.conversion_to_kilo})
+                return Response({'units':conversions},status=status.HTTP_200_OK)
+            except:
+                return Response({'units':conversions},status=status.HTTP_200_OK)
         except:
-            return Response({'units':conversions},status=status.HTTP_200_OK)
+            return Response({'message':'Ingredient does not exist.'},status=status.HTTP_404_NOT_FOUND)

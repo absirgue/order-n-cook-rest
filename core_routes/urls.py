@@ -10,7 +10,7 @@ urlpatterns = [
     path('ingredients/', views.IngredientsListAPIView.as_view(),name='ingredient_list'),
     path('remove_label_from_ingredient/<int:ingredientId>/<int:labelId>',views.LabelIngredientDelete.as_view()),
     path('remove_allergene_from_ingredient/<int:ingredientId>/<int:allergeneId>',views.AllergeneIngredientDelete.as_view()),
-    path('conversion_rate/',views.ConversionIngredient.as_view()),
-    path('kilogram_equivalent/',views.UnitEquivalence.as_view()),
-    path('ingredient_units/<int:ingredientId>/',views.IngredientUnits.as_view())
+    path('conversion_rate/',views.ConversionIngredient.as_view(),name='conversion_rate'),
+    path('kilogram_equivalent/',views.UnitEquivalence.as_view(),name='kilogram_equivalent'),
+    path('ingredient_units/<int:ingredientId>/',views.IngredientUnits.as_view(),name='ingredient_unit')
 ]

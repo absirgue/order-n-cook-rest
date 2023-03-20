@@ -1,0 +1,11 @@
+[
+    {
+        "model": "core_routes.conversions",
+        "pk": 1,
+        "fields": {
+            "ingredient": 2,
+            "unit": "millilittre",
+            "conversion_to_kilo": 0.0005
+        }
+    }
+]
