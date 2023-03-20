@@ -16,7 +16,7 @@ class Unites(models.TextChoices):
         LITTRE = "littre"
         UNITE = "unité"
         CUILLERE_A_SOUPE = "table_spoon"
-        CUILLERE_A_CAFE = "teas_spoon"
+        CUILLERE_A_CAFE = "tea_spoon"
         CUP = "cup"
 
 class Ingredients(models.Model):
@@ -77,8 +77,15 @@ class RecettesIngredients(models.Model):
     # Add validator
     buying_price = models.DecimalField(max_digits=8,decimal_places=2,default=0)
     recette = models.ForeignKey(Recettes, on_delete=models.CASCADE)
+
+class SousRecettes(models.Model):
+    unit = models.CharField(choices=Unites.choices, default="kilogramme",max_length=100)
+    quantity_in_kilogramme = models.DecimalField(max_digits = 12, decimal_places=7, default=1)
+    # Add validator
+    recette = models.ForeignKey(Recettes, on_delete=models.CASCADE)
+    sous_recette = models.ForeignKey(Recettes, on_delete=models.CASCADE, related_name='sous_recette')
     
-class RecettesPogressionElement(models.Model):
+class RecettesPogressionElements(models.Model):
     # Add validator
     ordering = models.IntegerField()
     text =  models.TextField()
