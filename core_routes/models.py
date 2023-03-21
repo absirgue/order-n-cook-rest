@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
@@ -40,12 +41,13 @@ class RecettesGenres(models.Model):
 class RecettesTastes(models.Model):
     name = models.CharField(max_length=100, blank=False)
 
-class RecettesInsipirations(models.Model):
+class RecettesInspirations(models.Model):
     name = models.CharField(max_length=100, blank=False)
 
 class RecettesCategories(models.Model):
     name = models.CharField(max_length=100, blank=False)
 
+# add inspiration
 class Recettes(models.Model):
     class RecetteUnits(models.TextChoices):
         PERSONNE = "personne"
@@ -53,21 +55,24 @@ class Recettes(models.Model):
         KILOGRAMME ="kilorgamme"
         LITTRE = "littre"
         CENTILITTRE = "centilittre"
-
+    name = models.CharField(max_length=250)
     quantity = models.IntegerField(blank=False)
+    # let free
     unit = models.CharField(choices=RecetteUnits.choices, default="personne",max_length=100)
-    genre = models.ManyToManyField(RecettesGenres)
-    category = models.ManyToManyField(RecettesCategories)
-    taste = models.ManyToManyField(RecettesTastes)
+    genres = models.ManyToManyField(RecettesGenres,blank=True)
+    categories = models.ManyToManyField(RecettesCategories,blank=True)
+    tastes = models.ManyToManyField(RecettesTastes,blank=True)
+    inspirations = models.ManyToManyField(RecettesInspirations,blank=True)
     # Add validator
     duration = models.IntegerField()
-    last_modification = models.DateField(default=timezone.now,validators=[
+    last_modification = models.DateField(default=datetime.date.today,validators=[
         MaxValueValidator(
             limit_value=date.today(),
             message='Date can not be later than today')])
     selected_for_menu = models.BooleanField(default=False)
-    selling_price = models.DecimalField(max_digits=6,decimal_places=2)
-    tva = models.DecimalField(max_digits=5,decimal_places=2)
+    selling_price = models.DecimalField(max_digits=6,decimal_places=2,null=True)
+    # Add validator (<100)
+    tva = models.DecimalField(max_digits=5,decimal_places=2,null=True)
 
 class RecettesIngredients(models.Model):
     ingredient = models.ForeignKey(Ingredients, on_delete=models.CASCADE)

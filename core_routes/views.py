@@ -33,6 +33,22 @@ from core_routes.helpers.helper_functions import *
 # 21. Ensure conversion exists before enabling creation of recette ingredient ✅
 # 22. Add GeneralConversions (gramme -> kilgoramme, ....) and getting a list of them for proposal on ingredient creation
 
+# 23. Recettes - list all recettes (not too much details ?) ✅
+# 24. Recettes - get detail recettes (ingredient, sous recette (= lien), progression)
+# 25. Recettes - create a recette
+# 26. Recettes - edit a recette
+# 27. Recettes - delete a recette
+# 28. Recettes - add a recette ingredient
+# 29. Recettes - edit a recette ingredient (allow only edit of quantity ?)
+# 30. Recettes - delete a recette ingredient
+# 31. Recettes - add a recette progression element
+# 32. Recettes - edit a recette progression element 
+# 33. Recettes - delete a recette progression element
+# 34. Recettes - delete a recette progression element
+# 35. Recettes - add a sous recette
+# 36. Recettes - edit sous recette (allow only quantity)
+# 37. Recettes - delete a sous recette
+# 38. Recettes - calculate effective price of recette (when Produits are created) and return it in List and Detail views
 
 class LabelsDetailAPIView(APIView):
     """
@@ -296,3 +312,20 @@ class IngredientUnits(APIView):
                 return Response({'units':conversions},status=status.HTTP_200_OK)
         except:
             return Response({'message':'Ingredient does not exist.'},status=status.HTTP_404_NOT_FOUND)
+        
+
+class RecettesListAPIView(APIView):
+    """
+    Get a list of or create an Allergene.
+    """
+    def get(self, request, format=None):
+        allergenes = Recettes.objects.all()
+        serializer = RecettesSerializer(allergenes, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = RecettesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
