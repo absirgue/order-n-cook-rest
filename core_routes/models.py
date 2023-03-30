@@ -20,14 +20,23 @@ class Unites(models.TextChoices):
         CUILLERE_A_CAFE = "tea_spoon"
         CUP = "cup"
 
+class IngredientsCategories(models.Model):
+    name = models.CharField(max_length=120, blank=False)
+    # author
+
+class IngredientsSubCategories(models.Model):
+    models.CharField(max_length=120, blank=False)
+    # author
 class Ingredients(models.Model):
     name = models.CharField(max_length=120, blank=False)
-    description = models.TextField()
+    description = models.TextField(blank= True)
     illustration = models.FileField(upload_to='ingredients/',blank=True)
-    labels = models.ManyToManyField(Labels)
-    allergenes = models.ManyToManyField(Allergenes)
-    conversion_to_kilo = models.DecimalField(max_digits = 12, decimal_places=7, default=1,validators=[MinValueValidator(limit_value=0)])
-    unit = models.CharField(default="kilogramme",max_length=100)
+    labels = models.ManyToManyField(Labels,blank= True)
+    allergenes = models.ManyToManyField(Allergenes,blank= True)
+    conversion_to_kilo = models.DecimalField(max_digits = 12, decimal_places=7, default=1,validators=[MinValueValidator(limit_value=0)],blank= True)
+    unit = models.CharField(default="kilogramme",max_length=100,blank= True)
+    category = models.OneToOneField(IngredientsCategories,on_delete=models.SET_NULL,null=True,blank= True)
+    sub_category = models.OneToOneField(IngredientsSubCategories,on_delete=models.SET_NULL,null=True,blank= True)
 
 class Conversions(models.Model):
     ingredient = models.ForeignKey(Ingredients, on_delete=models.CASCADE)
@@ -37,7 +46,6 @@ class Conversions(models.Model):
 
 class RecettesGenres(models.Model):
     name = models.CharField(max_length=100, blank=False)
-
 class RecettesTastes(models.Model):
     name = models.CharField(max_length=100, blank=False)
 
@@ -70,15 +78,19 @@ class Recettes(models.Model):
             limit_value=date.today(),
             message='Date can not be later than today')])
     selected_for_menu = models.BooleanField(default=False)
-    selling_price = models.DecimalField(max_digits=6,decimal_places=2,null=True)
+    # selling_price = models.DecimalField(max_digits=6,decimal_places=2,null=True)
     # Add validator (<100)
     tva = models.DecimalField(max_digits=5,decimal_places=2,null=True)
 
+    def selling_price(self):
+        #Implement
+        pass
+
+# make a IngredientsPourRecettes model that stors buying price.
 class RecettesIngredients(models.Model):
     ingredient = models.ForeignKey(Ingredients, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=10,decimal_places=3)
     unit = models.CharField(choices=Unites.choices, default="kilogramme",max_length=100)
-    quantity_in_kilogramme = models.DecimalField(max_digits = 12, decimal_places=7, default=1)
     # Add validator
     buying_price = models.DecimalField(max_digits=8,decimal_places=2,default=0)
     recette = models.ForeignKey(Recettes, on_delete=models.CASCADE)

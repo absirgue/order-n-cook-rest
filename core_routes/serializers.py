@@ -6,6 +6,16 @@ class AllergenesSerializer(serializers.ModelSerializer):
         model= Allergenes
         fields = '__all__'
 
+class IngredientsCategoriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= IngredientsCategories
+        fields = '__all__'
+
+class IngredientsSubCategoriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= IngredientsSubCategories
+        fields = '__all__'
+
 class ConversionsSerializer(serializers.ModelSerializer):
     class Meta:
         model= Conversions
@@ -25,9 +35,11 @@ class IngredientsSerializer(serializers.ModelSerializer):
 class IngredientsGetSerializer(serializers.ModelSerializer):
     labels = LabelsSerializer(many=True,read_only=True)
     allergenes = AllergenesSerializer(many=True,read_only=True)
+    category = IngredientsCategoriesSerializer(many=True,read_only=True)
+    sub_category = IngredientsSubCategoriesSerializer(many=True,read_only=True)
     class Meta:
         model = Ingredients
-        fields = ('id','name', 'description','illustration','labels','allergenes','conversion_to_kilo','unit')
+        fields = ('id','name', 'description','illustration','labels','allergenes','conversion_to_kilo','unit','category','sub_category')
     
 class RecettesCategoriesSerializer(serializers.ModelSerializer):
      class Meta:
@@ -48,6 +60,7 @@ class RecettesGenresSerializer(serializers.ModelSerializer):
      class Meta:
         model= RecettesGenres
         fields = '__all__'
+
 class RecettesSerializer(serializers.ModelSerializer):
     categories = RecettesCategoriesSerializer(many=True,read_only=True)
     tastes = RecettesTastesSerializer(many=True,read_only=True)
@@ -56,4 +69,40 @@ class RecettesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recettes
         fields = '__all__'
-    
+
+class GetRecettesIngredientsSerializer(serializers.ModelSerializer):
+    ingredient = IngredientsGetSerializer()
+    class Meta:
+        model = RecettesIngredients
+        fields = ('ingredient', 'quantity', 'unit','buying_price')
+
+class RecettesIngredientsSerializer(serializers.ModelSerializer):
+    ingredient = IngredientsSerializer()
+    class Meta:
+        model = RecettesIngredients
+        fields = '__all__'
+
+class CreateRecettesIngredientsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecettesIngredients
+        fields = '__all__'
+
+class SousRecettesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SousRecettes
+        fields = '__all__'
+
+class RecettesPogressionElementsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecettesPogressionElements
+        fields = '__all__'
+
+class GetRecettesPogressionElementsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecettesPogressionElements
+        fields = ('ordering','text')
+
+class SousRecettesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SousRecettes
+        fields ='__all__'

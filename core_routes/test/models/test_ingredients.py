@@ -39,7 +39,7 @@ class IngredientsModelTestCase(TestCase):
         self._assert_ingredient_is_valid()
     
     def test_ingredient_description_can_not_be_empty(self):
-        self.ingredient.description = None
+        self.ingredient.name = None
         self._assert_ingredient_is_invalid()
     
     def test_ingredient_description_can_be_500_characters(self):
