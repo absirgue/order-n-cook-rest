@@ -92,17 +92,12 @@ class SousRecettesSerializer(serializers.ModelSerializer):
         model = SousRecettes
         fields = '__all__'
 
-class RecettesPogressionElementsSerializer(serializers.ModelSerializer):
+class RecettesProgressionElementsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = RecettesPogressionElements
+        model = RecettesProgressionElements
         fields = '__all__'
 
 class GetRecettesPogressionElementsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = RecettesPogressionElements
+        model = RecettesProgressionElements
         fields = ('ordering','text')
-
-class SousRecettesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SousRecettes
-        fields ='__all__'

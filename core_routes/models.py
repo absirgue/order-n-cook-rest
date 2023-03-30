@@ -46,6 +46,7 @@ class Conversions(models.Model):
 
 class RecettesGenres(models.Model):
     name = models.CharField(max_length=100, blank=False)
+
 class RecettesTastes(models.Model):
     name = models.CharField(max_length=100, blank=False)
 
@@ -98,11 +99,12 @@ class RecettesIngredients(models.Model):
 class SousRecettes(models.Model):
     unit = models.CharField(choices=Unites.choices, default="kilogramme",max_length=100)
     quantity_in_kilogramme = models.DecimalField(max_digits = 12, decimal_places=7, default=1)
+    quantity = models.DecimalField(max_digits = 12, decimal_places=7, default=1)
     # Add validator
     recette = models.ForeignKey(Recettes, on_delete=models.CASCADE)
     sous_recette = models.ForeignKey(Recettes, on_delete=models.CASCADE, related_name='sous_recette')
     
-class RecettesPogressionElements(models.Model):
+class RecettesProgressionElements(models.Model):
     # Add validator
     ordering = models.IntegerField()
     text =  models.TextField()
