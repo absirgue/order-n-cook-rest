@@ -6,6 +6,10 @@ from core_routes.serializers import *
 from rest_framework.views import APIView
 from core_routes.helpers.helper_functions import *
 
+"""
+This file holds all view classes related to the conversion of a given quantity of 
+ingredient between two units.
+"""
 class ConversionIngredient(APIView):
     """
     Get, create, update, or delete the conversion rate for an item to an unit to kilogramme.

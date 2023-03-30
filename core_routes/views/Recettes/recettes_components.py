@@ -6,6 +6,10 @@ from core_routes.serializers import *
 from rest_framework.views import APIView
 from core_routes.helpers.helper_functions import *
 
+"""
+This file holds all view classes related to the RecettesIngredients, SousRecettes,
+and RecettesProgressionElements models. 
+"""
 class RecettesIngredientsDetailAPIView(APIView):
     """
     Retrieve, update or delete a snippet a RecettesIngredients item.

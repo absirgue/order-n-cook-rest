@@ -6,6 +6,9 @@ from core_routes.serializers import *
 from rest_framework.views import APIView
 from core_routes.helpers.helper_functions import *
 
+"""
+This file holds all view classes related to the Allergenes and Labels models. 
+"""
 class LabelIngredientDelete(APIView):
     """
     Delete a Label from an Ingredient.
