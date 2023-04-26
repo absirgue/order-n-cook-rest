@@ -88,15 +88,34 @@ class UnitEquivalence(APIView):
         else:
             return Response({'message':'Pas de conversion en kilorgamme trouvée.'},status=status.HTTP_400_BAD_REQUEST)
 
+class IngredientsUnitsListView(APIView):
+    """
+    Get a list of the units available for an ingredient.
+    """
+    def get(self,request, format=None):
+        ingredients = Ingredients.objects.all()
+        ingredient_serializer = IngredientOnlyNameSerializer(ingredients, many=True)
+        return Response(ingredient_serializer.data)
+    
+class IngredientsUnitsListView(APIView):
+    """
+    Get a list of the units available for an ingredient.
+    """
+    def get(self,request, format=None):
+        ingredients = Ingredients.objects.all()
+        ingredient_serializer = IngredientOnlyNameSerializer(ingredients, many=True)
+        return Response(ingredient_serializer.data)
+    
 class IngredientUnits(APIView):
     """
     Get a list of the units available for an ingredient.
     """
-    def get(self,request,ingredientId, format=None):
-        if not (ingredientId):
+    def get(self,request,recetteIngredientId, format=None):
+        if not (recetteIngredientId):
             return Response({'message':'Not enough data provided.'},status=status.HTTP_400_BAD_REQUEST)
         try:
-            ingredient = Ingredients.objects.get(id=ingredientId)
+            ingredient = RecetteIngredient.objects.get(id=recetteIngredientId).ingredient
+            print(ingredient)
             conversions = [{"unit":"kilogramme","conversion_rate":1}]
             if ingredient.unit != "kilogramme":
                 conversions.append({"unit":ingredient.unit,"conversion_rate":ingredient.conversion_to_kilo})
@@ -110,3 +129,7 @@ class IngredientUnits(APIView):
                 return Response({'units':conversions},status=status.HTTP_200_OK)
         except:
             return Response({'message':'Ingredient does not exist.'},status=status.HTTP_404_NOT_FOUND)    
+
+
+        
+

@@ -16,6 +16,7 @@ class IngredientsListAPIView(APIView):
     def get(self, request, format=None):
         ingredients = Ingredients.objects.all()
         ingredient_serializer = IngredientsGetSerializer(ingredients, many=True)
+        
         return Response(ingredient_serializer.data)
 
     def post(self, request, format=None):
@@ -52,3 +53,37 @@ class IngredientsDetailAPIView(APIView):
         snippet = self.get_object(pk)
         snippet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class IngredientCategories(APIView):
+    """
+    Get a list of or create an Ingredient Category.
+    """
+    def get(self, request, format=None):
+        ingredients = IngredientsCategories.objects.all()
+        ingredient_serializer = IngredientsCategoriesSerializer(ingredients, many=True)
+        
+        return Response(ingredient_serializer.data)
+
+    def post(self, request, format=None):
+        serializer = IngredientsCategoriesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class IngredientSousCategories(APIView):
+    """
+    Get a list of or create an Ingredient Sous Category.
+    """
+    def get(self, request, format=None):
+        ingredients = IngredientsSubCategories.objects.all()
+        ingredient_serializer = IngredientsSubCategoriesSerializer(ingredients, many=True)
+        
+        return Response(ingredient_serializer.data)
+
+    def post(self, request, format=None):
+        serializer = IngredientsSubCategoriesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

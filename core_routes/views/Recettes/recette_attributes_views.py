@@ -6,63 +6,43 @@ from core_routes.serializers import *
 from rest_framework.views import APIView
 from core_routes.helpers.helper_functions import *
 
-"""
-This file holds all view classes related to the RecettesGenres, RecettesInspirations,
-RecettesTastes and RecettesCategories models. 
-"""
-class RecettesGenresDetailAPIView(APIView):
-    """
-    Retrieve, update or delete a snippet a RecettesGenres item.
-    """
-    def get_object(self, pk):
-        try:
-            return RecettesGenres.objects.get(pk=pk)
-        except Recettes.DoesNotExist:
-            raise Http404
 
-    def get(self, request, pk, format=None):
-        snippet = self.get_object(pk)
-        serializer = RecettesGenresSerializer(snippet)
+
+class RecetteTasteListView(APIView):
+    def get(self, request, format=None):
+        recettes = RecetteTaste.objects.all()
+        serializer = RecetteTasteSerializer(recettes, many=True)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
-        snippet = self.get_object(pk)
-        serializer = RecettesGenresSerializer(snippet, data=request.data,partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        snippet = self.get_object(pk)
-        snippet.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def post(self,request, format=None):
-        serializer = RecettesGenresSerializer(data=request.data)
+    def post(self, request, format=None):
+        serializer = RecetteTasteSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class RecettesInspirationsDetailAPIView(APIView):
+"""
+This file holds all view classes related to the RecetteGenres, RecetteInspirations,
+RecetteTastes and RecetteCategories models. 
+"""
+class RecetteGenreDetailAPIView(APIView):
     """
-    Retrieve, update or delete a snippet a RecettesInspirations item.
+    Retrieve, update or delete a snippet a RecetteGenres item.
     """
     def get_object(self, pk):
         try:
-            return RecettesInspirations.objects.get(pk=pk)
-        except Recettes.DoesNotExist:
+            return RecetteGenre.objects.get(pk=pk)
+        except Recette.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
         snippet = self.get_object(pk)
-        serializer = RecettesInspirationsSerializer(snippet)
+        serializer = RecetteGenreSerializer(snippet)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
         snippet = self.get_object(pk)
-        serializer = RecettesInspirationsSerializer(snippet, data=request.data,partial=True)
+        serializer = RecetteGenreSerializer(snippet, data=request.data,partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
@@ -73,67 +53,59 @@ class RecettesInspirationsDetailAPIView(APIView):
         snippet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
     def post(self,request, format=None):
-        serializer = RecettesInspirationsSerializer(data=request.data)
+        serializer = RecetteGenreSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class RecetteGenreListView(APIView):
+    def get(self, request, format=None):
+        recettes = RecetteGenre.objects.all()
+        serializer = RecetteGenreSerializer(recettes, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = RecetteGenreSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class RecettesCategoriesDetailAPIView(APIView):
-    """
-    Retrieve, update or delete a snippet a RecettesCategories item.
-    """
-    def get_object(self, pk):
-        try:
-            return RecettesCategories.objects.get(pk=pk)
-        except Recettes.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        snippet = self.get_object(pk)
-        serializer = RecettesCategoriesSerializer(snippet)
+class RecetteCategoryListView(APIView):
+    def get(self, request, format=None):
+        recettes = RecetteCategory.objects.all()
+        serializer = RecetteCategorySerializer(recettes, many=True)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
-        snippet = self.get_object(pk)
-        serializer = RecettesCategoriesSerializer(snippet, data=request.data,partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        snippet = self.get_object(pk)
-        snippet.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def post(self,request, format=None):
-        serializer = RecettesCategoriesSerializer(data=request.data)
+    def post(self, request, format=None):
+        serializer = RecetteCategorySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class RecettesTastesDetailAPIView(APIView):
+
+    
+class RecetteCategoryDetailAPIView(APIView):
     """
-    Retrieve, update or delete a snippet a RecettesTastes item.
+    Retrieve, update or delete a snippet a RecetteCategories item.
     """
     def get_object(self, pk):
         try:
-            return RecettesTastes.objects.get(pk=pk)
-        except Recettes.DoesNotExist:
+            return RecetteCategory.objects.get(pk=pk)
+        except Recette.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
         snippet = self.get_object(pk)
-        serializer = RecettesTastesSerializer(snippet)
+        serializer = RecetteCategorySerializer(snippet)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
         snippet = self.get_object(pk)
-        serializer = RecettesTastesSerializer(snippet, data=request.data,partial=True)
+        serializer = RecetteCategorySerializer(snippet, data=request.data,partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
@@ -145,7 +117,42 @@ class RecettesTastesDetailAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def post(self,request, format=None):
-        serializer = RecettesTastesSerializer(data=request.data)
+        serializer = RecetteCategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class RecetteTasteDetailAPIView(APIView):
+    """
+    Retrieve, update or delete a snippet a RecetteTastes item.
+    """
+    def get_object(self, pk):
+        try:
+            return RecetteTaste.objects.get(pk=pk)
+        except Recette.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        snippet = self.get_object(pk)
+        serializer = RecetteTasteSerializer(snippet)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        snippet = self.get_object(pk)
+        serializer = RecetteTasteSerializer(snippet, data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        snippet = self.get_object(pk)
+        snippet.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def post(self,request, format=None):
+        serializer = RecetteTasteSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
