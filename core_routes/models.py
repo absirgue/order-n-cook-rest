@@ -92,7 +92,7 @@ class Recette(models.Model):
 
         
     name = models.CharField(max_length=250,blank=False)
-    quantity = models.IntegerField(blank=True,null=True)
+    quantity = models.IntegerField()
     unit = models.CharField(choices=RecetteUnits.choices,max_length=100,null=True)
     genres = models.ManyToManyField(RecetteGenre,blank=True)
     category = models.ForeignKey(RecetteCategory,blank=True,null=True, on_delete=models.SET_NULL)
@@ -121,7 +121,7 @@ class Recette(models.Model):
 # Add section idea
 class RecetteIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredients, on_delete=models.CASCADE)
-    quantity = models.DecimalField(max_digits = 12, decimal_places=7)
+    quantity = models.DecimalField(max_digits = 12, decimal_places=5,blank=False)
     unit = models.CharField(default="kilogramme",max_length=100)
     note = models.CharField(max_length=250,blank=True)
     recette = models.ForeignKey(Recette, on_delete=models.CASCADE)
@@ -129,10 +129,15 @@ class RecetteIngredient(models.Model):
 
 class SousRecette(models.Model):
     unit = models.CharField(default="kilogramme",max_length=100)
-    quantity = models.DecimalField(max_digits = 12, decimal_places=7, default=1)
+    quantity = models.DecimalField(max_digits = 12, decimal_places=5,default =1)
     note =  models.CharField(max_length=250,blank=True)
     recette = models.ForeignKey(Recette, on_delete=models.CASCADE)
     sous_recette = models.ForeignKey(Recette, on_delete=models.CASCADE, related_name='sous_recette')
+
+    class Meta:
+        constraints = [
+          models.CheckConstraint(check=~models.Q(recette=models.F('sous_recette')), name='can_not_add_itself'),
+        ]
     
 class RecetteProgressionElement(models.Model):
     rank = models.IntegerField(validators=[MinValueValidator(limit_value=0)], blank=False)

@@ -60,9 +60,13 @@ class RecetteDetailAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 class SousRecetteListView(APIView):
-    def get(self, request, format=None):
+    def get(self, request, recette_id, format=None):
         recettes = Recette.objects.all()
-        serialized_recettes = SousRecetteOptionSerializer(recettes,many=True)
+        list_of_recettes = []
+        for recette in recettes:
+            if recette.id != recette_id and recette.unit and recette.quantity:
+                list_of_recettes.append(recette)
+        serialized_recettes = SousRecetteOptionSerializer(list_of_recettes,many=True)
         return Response(serialized_recettes.data)
     
 class DuplicateRecette(APIView):
@@ -70,6 +74,9 @@ class DuplicateRecette(APIView):
         # Check if caller is the author of the duplicated recette
         new_recette = Recette.objects.get(id = recette_id)
         new_recette.id = None
+        new_recette.selected_for_menu = False
+        new_recette.selected_for_next_menu = False
+        new_recette.is_to_modify = True
         new_recette.name = new_recette.name + " (copie)"
         new_recette.save()
         for ingredient in RecetteIngredient.objects.filter(recette=recette_id):

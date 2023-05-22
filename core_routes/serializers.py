@@ -251,11 +251,20 @@ class RecetteIngredientSerializer(serializers.ModelSerializer):
 
 
 class CreateRecetteIngredientSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = RecetteIngredient
         fields = '__all__'
+    
 
 class SousRecetteSerializer(serializers.ModelSerializer):
+
+    def validate_sous_recette(self,sous_recette):
+        if not (sous_recette.unit and sous_recette.quantity):
+            raise serializers.ValidationError("Cette recette ne peut pas être une sous recette car sa quantité et son unité sont inconnues.")
+        else:
+            return sous_recette
+        
     class Meta:
         model = SousRecette
         fields = '__all__'
@@ -336,7 +345,7 @@ class GetSousRecetteSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SousRecette
-        fields = ('id','name','unit','quantity','allergenes','cost')
+        fields = ('id','name','unit','quantity','allergenes','cost','note')
 
 class RecetteProgressionElementUpdateSerializer(serializers.ModelSerializer):
     class Meta:

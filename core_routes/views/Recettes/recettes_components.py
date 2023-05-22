@@ -48,7 +48,7 @@ class RecetteIngredientsDetailAPIView(APIView):
 
 class SousRecettesDetailAPIView(APIView):
     """
-    Retrieve, update or delete a snippet a RecettesIngredients item.
+    Retrieve, update or delete a snippet a SousRecette item.
     """
     def get_object(self, pk):
         try:
@@ -73,8 +73,8 @@ class SousRecettesDetailAPIView(APIView):
         print(request.data)
         serializer = SousRecetteSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
  

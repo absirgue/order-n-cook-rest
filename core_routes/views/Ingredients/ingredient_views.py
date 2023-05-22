@@ -22,8 +22,11 @@ class IngredientsListAPIView(APIView):
     def post(self, request, format=None):
         serializer = IngredientsSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if not Ingredients.objects.filter(name=request.data["name"]).exists():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class IngredientsDetailAPIView(APIView):
