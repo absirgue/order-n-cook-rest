@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from core_routes.models import *
-import decimal
+from core_routes.helpers.helper_functions import get_recette_ingredient_cost,get_raw_cost_for_recette_instance,get_ht_selling_price,get_ttc_unit_selling_price
 
 class AllergenesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,9 +57,6 @@ class RecetteListGetSerializer(serializers.ModelSerializer):
             season = []
             index_season_start = months.index(instance.season_start.lower())
             index_season_end = months.index(instance.season_end.lower())
-            print(instance.name)
-            print(index_season_end)
-            print(index_season_start)
             if index_season_start > index_season_end:
                 for i in range (12, index_season_start-2,-1):
                     season.append(True)
@@ -79,8 +76,39 @@ class RecetteListGetSerializer(serializers.ModelSerializer):
             return None
 
     def get_selling_price(self,instance):
-        return 12.30
-    
+        return_obj = {}
+        raw_material_cost = get_raw_cost_for_recette_instance(instance)
+        print("RECETTE CLACULATIOn")
+        print(raw_material_cost)
+        ht_cost = get_ht_selling_price(instance,raw_material_cost)
+        print(ht_cost)
+        unit_ttc_selling_price = get_ttc_unit_selling_price(instance,ht_cost)
+        print("UNIT SELLING PRICE BEFORE ANYTHING")
+        print(type(unit_ttc_selling_price))
+        if unit_ttc_selling_price:
+            return_obj["price"] = unit_ttc_selling_price
+        else:
+            return_obj["price"] = "-"
+        if instance.last_selling_price and unit_ttc_selling_price:
+            print("COMPARISON")
+            print(unit_ttc_selling_price)
+            print(instance.last_selling_price)
+            if unit_ttc_selling_price < instance.last_selling_price:
+              return_obj["evolution"] = "LOWER"
+            elif unit_ttc_selling_price > instance.last_selling_price:
+                return_obj["evolution"]= "HIGHER"
+            else:
+                 return_obj["evolution"]= "SAME"
+        print("UNIT TTC SELLING PRICE:")
+        print(unit_ttc_selling_price)
+        if unit_ttc_selling_price:
+            print("EDITING")
+            instance.last_selling_price = unit_ttc_selling_price
+            instance.save()
+            print("EDTED")
+            print(instance.last_selling_price)
+        return return_obj
+
     def get_allergenes(self,instance):
         instance_ingredients = RecetteIngredient.objects.filter(recette=instance)
         allergenes = []
@@ -105,16 +133,13 @@ class RecetteDetailGetSerializer(serializers.ModelSerializer):
     sous_recette = serializers.SerializerMethodField()
     sections = serializers.SerializerMethodField()
     progression_elements = serializers.SerializerMethodField()
-    cost_ingredients = serializers.SerializerMethodField()
-    ht_selling_price= serializers.SerializerMethodField()
-    ttc_selling_price= serializers.SerializerMethodField()
-    ttc_unit_selling_price= serializers.SerializerMethodField()
+   
 
     def get_ingredients(self,instance):
         all_ingredients = RecetteIngredient.objects.filter(recette=instance)
         ingredients_value = []
         for ingredient in all_ingredients:
-            ingedient_obj = {"id":ingredient.id,"ingredient_id":ingredient.ingredient.id,"name":ingredient.ingredient.name,"allergenes":AllergenesSerializer(ingredient.ingredient.allergenes,many=True).data,"unit":ingredient.unit,"quantity":str(float(str(ingredient.quantity))),"note":ingredient.note,"cost":12}
+            ingedient_obj = {"id":ingredient.id,"ingredient_id":ingredient.ingredient.id,"name":ingredient.ingredient.name,"allergenes":AllergenesSerializer(ingredient.ingredient.allergenes,many=True).data,"unit":ingredient.unit,"quantity":str(float(str(ingredient.quantity))),"note":ingredient.note,"cost":get_recette_ingredient_cost(ingredient)}
             if ingredient.section:
                 ingedient_obj["section"] = ingredient.section
             ingredients_value.append(ingedient_obj)
@@ -144,9 +169,6 @@ class RecetteDetailGetSerializer(serializers.ModelSerializer):
             season = []
             index_season_start = months.index(instance.season_start.lower())
             index_season_end = months.index(instance.season_end.lower())
-            print(instance.name)
-            print(index_season_end)
-            print(index_season_start)
             if index_season_start > index_season_end:
                 for i in range (12, index_season_start-2,-1):
                     season.append(True)
@@ -166,35 +188,6 @@ class RecetteDetailGetSerializer(serializers.ModelSerializer):
             return None
     
 
-    def get_ht_selling_price(self,instance):
-        if instance.coefficient:
-            return self.get_cost_ingredients(instance) * float(instance.coefficient)
-        else:
-            return None
-
-    def get_numeric_value_ttc_selling_price(self,instance):
-        if instance.tva:
-            return decimal.Decimal(self.get_ht_selling_price(instance)) * (100 + instance.tva) / 100
-        else: 
-            return None
-    
-    def get_ttc_selling_price(self,instance):
-        numeric_value = self.get_numeric_value_ttc_selling_price(instance)
-        if numeric_value:
-            return str(round(numeric_value, 2))
-        else:
-            return None
-
-    def get_ttc_unit_selling_price(self,instance):
-        ttc_selling_price = self.get_numeric_value_ttc_selling_price(instance)
-        if ttc_selling_price and instance.quantity:
-            numeric_value = ttc_selling_price / instance.quantity 
-            return str(round(numeric_value, 2))
-        else:
-            return None
-    
-    def get_cost_ingredients(self,instance):
-        return 12.3
     
     def get_allergenes(self,instance):
         instance_ingredients = RecetteIngredient.objects.filter(recette=instance)
@@ -211,7 +204,7 @@ class RecetteDetailGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recette
-        fields = ('id','ingredients','sous_recette','sections','progression_elements','name', 'tva','coefficient','cost_ingredients','quantity','unit','genres','category','tastes','duration','temperature','sous_vide_pression','sous_vide_soudure','selected_for_menu','selected_for_next_menu','season','ht_selling_price','ttc_selling_price','allergenes','ttc_unit_selling_price','is_to_modify')
+        fields = ('id','ingredients','sous_recette','sections','progression_elements','name', 'tva','coefficient','quantity','unit','genres','category','tastes','duration','temperature','sous_vide_pression','sous_vide_soudure','selected_for_menu','selected_for_next_menu','season','is_to_modify','allergenes')
 
 
 class RecetteCategorySerializer(serializers.ModelSerializer):
@@ -315,7 +308,11 @@ class GetSousRecetteSerializer(serializers.ModelSerializer):
     allergenes = serializers.SerializerMethodField()
     quantity = serializers.SerializerMethodField()
     cost = serializers.SerializerMethodField()
-    id = serializers.SerializerMethodField()
+    sous_recette_id = serializers.SerializerMethodField()
+    cost = serializers.SerializerMethodField()
+
+    def get_cost(self, instance):
+        return get_raw_cost_for_recette_instance(instance.sous_recette) * float(instance.quantity)/float(instance.sous_recette.quantity)
 
     def get_quantity(self,instance):
         # Weird structure to remove trailing 0s
@@ -324,11 +321,8 @@ class GetSousRecetteSerializer(serializers.ModelSerializer):
     def get_name(self,instance):
         return instance.sous_recette.name
     
-    def get_id(self,instance):
+    def get_sous_recette_id(self,instance):
         return instance.sous_recette.id
-    
-    def get_cost(self,instance):
-        return 12
 
     def get_allergenes(self,instance):
         instance_ingredients = RecetteIngredient.objects.filter(recette=instance.sous_recette)
@@ -345,7 +339,7 @@ class GetSousRecetteSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SousRecette
-        fields = ('id','name','unit','quantity','allergenes','cost','note')
+        fields = ('sous_recette_id','id','name','unit','quantity','allergenes','cost','note','recette')
 
 class RecetteProgressionElementUpdateSerializer(serializers.ModelSerializer):
     class Meta:

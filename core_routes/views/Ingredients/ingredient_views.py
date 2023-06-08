@@ -5,6 +5,7 @@ from core_routes.models import *
 from core_routes.serializers import *
 from rest_framework.views import APIView
 from core_routes.helpers.helper_functions import *
+from core_routes.fournisseur_serializers import ProduitForIngredientSerializer
 
 """
 This file holds all view classes related to the Ingredients model. 
@@ -90,3 +91,10 @@ class IngredientSousCategories(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class ProduitsForIngredientsView(APIView):
+     def get(self, request,ingredient_id, format=None):
+        produits_for_ingredient = Produit.objects.filter(ingredient=ingredient_id)
+        ingredient_serializer = ProduitForIngredientSerializer(produits_for_ingredient, many=True)
+        
+        return Response(ingredient_serializer.data)

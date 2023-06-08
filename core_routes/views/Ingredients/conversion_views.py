@@ -113,11 +113,11 @@ class IngredientUnits(APIView):
     """
     Get a list of the units available for an ingredient.
     """
-    def get(self,request,recetteIngredientId, format=None):
-        if not (recetteIngredientId):
+    def get(self,request,ingredientId, format=None):
+        if not (ingredientId):
             return Response({'message':'Not enough data provided.'},status=status.HTTP_400_BAD_REQUEST)
         try:
-            ingredient = RecetteIngredient.objects.get(id=recetteIngredientId).ingredient
+            ingredient = Ingredients.objects.get(id=ingredientId)
             print(ingredient)
             conversions = [{"unit":"kilogramme","conversion_rate":1}]
             if ingredient.unit != "kilogramme":

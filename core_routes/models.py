@@ -69,13 +69,6 @@ class RecetteCategory(models.Model):
 
 # add inspiration
 class Recette(models.Model):
-    class RecetteUnits(models.TextChoices):
-        PERSONNE = "personne"
-        GRAMME = "gramme"
-        KILOGRAMME ="kilorgamme"
-        LITTRE = "littre"
-        CENTILITTRE = "centilittre"
-    
     class Months(models.TextChoices):
         JANVIER = "Janvier"
         FEVRIER = "Février"
@@ -89,12 +82,12 @@ class Recette(models.Model):
         OCTOBRE = "Octobre"
         NOVEMBRE = "Novembre"
         DECEMBRE = "Décembre"
-
         
     name = models.CharField(max_length=250,blank=False)
-    quantity = models.IntegerField()
-    unit = models.CharField(choices=RecetteUnits.choices,max_length=100,null=True)
+    quantity = models.IntegerField(null=True,blank=True)
+    unit = models.CharField(max_length=100,null=True)
     genres = models.ManyToManyField(RecetteGenre,blank=True)
+    last_selling_price = models.DecimalField( max_digits=10, decimal_places=2,null=True)
     category = models.ForeignKey(RecetteCategory,blank=True,null=True, on_delete=models.SET_NULL)
     tastes = models.ManyToManyField(RecetteTaste,blank=True)
     duration = models.IntegerField(validators=[MinValueValidator(limit_value=0)],blank=True,null=True)
@@ -128,7 +121,7 @@ class RecetteIngredient(models.Model):
     section = models.IntegerField(validators=[MinValueValidator(limit_value=0)], blank=True,null=True)
 
 class SousRecette(models.Model):
-    unit = models.CharField(default="kilogramme",max_length=100)
+    unit = models.CharField(max_length=100,blank=False,null=False)
     quantity = models.DecimalField(max_digits = 12, decimal_places=5,default =1)
     note =  models.CharField(max_length=250,blank=True)
     recette = models.ForeignKey(Recette, on_delete=models.CASCADE)
@@ -149,6 +142,74 @@ class RecetteSection(models.Model):
     number = models.IntegerField(validators=[MinValueValidator(limit_value=0)], blank=False)
     name = models.CharField(max_length=200, blank=False)
     recette = models.ForeignKey(Recette, on_delete=models.CASCADE)
+
+class FournisseurCategory(models.Model):
+    name = models.CharField(max_length=120, blank=False,primary_key=True)
+    # author ? 
+
+class FournisseurSpecialty(models.Model):
+    name = models.CharField(max_length=120, blank=False,primary_key=True)
+     # author ? 
+    
+class Fournisseur(models.Model):
+    name = models.CharField(max_length=250, blank=False)
+    last_order_time = models.CharField(max_length=20, blank=True)
+    category = models.ForeignKey(FournisseurCategory,blank=False,on_delete=models.CASCADE)
+    specialty = models.ForeignKey(FournisseurSpecialty,null=True, on_delete=models.CASCADE)
+    address = models.CharField(max_length=250, blank=True)
+    address_line_2 = models.CharField(max_length=250, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    city = models.CharField(max_length=150, blank=True)
+    department = models.CharField(max_length=150, blank=True)
+    country = models.CharField(max_length=150, blank=True)
+    client_code = models.CharField(max_length=100, blank=True)
+    principal_phone_number = models.CharField(max_length=12, blank=True)
+    ordering_phone_number = models.CharField(max_length=12, blank=True)
+    accounting_phone_number = models.CharField(max_length=12, blank=True)
+    principal_email = models.EmailField(max_length=50, blank=True)
+    ordering_email = models.EmailField(max_length=50, blank=True)
+    cc_sales_email = models.EmailField(max_length=50, blank=True)
+    delivers_monday = models.BooleanField(default=False)
+    delivers_tuesday = models.BooleanField(default=False)
+    delivers_wednesday = models.BooleanField(default=False)
+    delivers_thursday = models.BooleanField(default=False)
+    delivers_friday = models.BooleanField(default=False)
+    delivers_saturday = models.BooleanField(default=False)
+    delivers_sunday = models.BooleanField(default=False)
+
+class FournisseurBack(models.Model):
+    created_on = models.DateField(default=datetime.date.today,validators=[
+        MaxValueValidator(
+            limit_value=date.today(),
+            message='Date can not be later than today')])
+    # created_by = 
+    original_information_source = models.ForeignKey(Fournisseur, blank=False, on_delete=models.CASCADE)
+
+class Produit(models.Model):
+    ingredient = models.ForeignKey(Ingredients, blank=False, on_delete=models.CASCADE)
+    fournisseur = models.ForeignKey(Fournisseur, blank=False, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits = 7, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
+    quantity = models.DecimalField(max_digits = 7, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
+    unit = models.CharField(max_length=75, blank=True)
+    labels = models.ManyToManyField(Labels,blank= True)
+    geographic_location = models.CharField(max_length=150, blank=True)
+
+class ProduitBack(models.Model):
+    created_on = models.DateField(default=datetime.date.today,validators=[
+        MaxValueValidator(
+            limit_value=date.today(),
+            message='Date can not be later than today')])
+    # created_by = 
+    original_information_source = models.ForeignKey(Produit, blank=False, on_delete=models.CASCADE)
+
+class ProduitPriceTracker(models.Model):
+    created_on = models.DateField(default=datetime.date.today,validators=[
+        MaxValueValidator(
+            limit_value=date.today(),
+            message='Date can not be later than today')])
+    produit = models.ForeignKey(Produit, blank=False, on_delete=models.CASCADE)
+    kilogramme_price = models.DecimalField(max_digits = 7, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
+
 
 
 

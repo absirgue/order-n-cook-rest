@@ -21,9 +21,11 @@ class RecetteListAPIView(APIView):
 
     def post(self, request, format=None):
         serializer = RecetteSerializer(data=request.data)
+        print(request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class RecetteDetailAPIView(APIView):
@@ -40,7 +42,21 @@ class RecetteDetailAPIView(APIView):
         print("ACCESSED")
         recette_object = self.get_object(pk)
         recette_serializer = RecetteDetailGetSerializer(recette_object)
-        return Response(recette_serializer.data)
+        recette_data = recette_serializer.data
+        ingredient_cost = get_raw_cost_from_serialized_recette(recette_data)
+        ht_selling_price = get_ht_selling_price(recette_object,ingredient_cost)
+        ttc_selling_price = get_ttc_selling_price(recette_object,ht_selling_price)
+        ttc_unit_selling_price = get_ttc_unit_selling_price(recette_object,ht_selling_price)
+        recette_data["cost_ingredients"] = ingredient_cost
+        recette_data["ht_selling_price"] = ht_selling_price
+        recette_data["ttc_selling_price"] = ttc_selling_price
+        recette_data["ttc_unit_selling_price"] = ttc_unit_selling_price
+        all_costs_are_known = True
+        for ingredient in recette_data["ingredients"]:
+            if not ingredient["cost"]:
+                all_costs_are_known = False
+        recette_data["all_costs_are_known"] = all_costs_are_known
+        return Response(recette_data)
 
     def put(self, request, pk, format=None):
         snippet = self.get_object(pk)
@@ -64,7 +80,7 @@ class SousRecetteListView(APIView):
         recettes = Recette.objects.all()
         list_of_recettes = []
         for recette in recettes:
-            if recette.id != recette_id and recette.unit and recette.quantity:
+            if sous_recette_not_linked_to_recette(recette_id,recette) and recette.unit and recette.quantity and recette_id != recette.id:
                 list_of_recettes.append(recette)
         serialized_recettes = SousRecetteOptionSerializer(list_of_recettes,many=True)
         return Response(serialized_recettes.data)

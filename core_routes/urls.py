@@ -5,6 +5,8 @@ from core_routes.views.Ingredients.ingredient_views import *
 from core_routes.views.Recettes.recette_attributes_views import *
 from core_routes.views.Recettes.recettes_components import *
 from core_routes.views.Recettes.recettes_views import *
+from core_routes.views.Fournisseurs.fournisseur_views import *
+from core_routes.views.Fournisseurs.fournisseur_components_views import *
 
 
 urlpatterns = [
@@ -21,7 +23,7 @@ urlpatterns = [
     path('conversion_rate/',ConversionIngredient.as_view(),name='conversion_rate'),
     path('kilogram_equivalent/',UnitEquivalence.as_view(),name='kilogram_equivalent'),
     path('all_ingredient_and_units/',IngredientsUnitsListView.as_view(),name='ingredients_unit'),
-    path('ingredient_units/<int:recetteIngredientId>/',IngredientUnits.as_view(),name='ingredient_unit'),
+    path('ingredient_units/<int:ingredientId>/',IngredientUnits.as_view(),name='ingredient_unit'),
     path('recettes/',RecetteListAPIView.as_view(),name='recettes_list'),
     path('recettes/<int:pk>/',RecetteDetailAPIView.as_view(),name='recettes_detail'),
     path('recette_ingredients/<int:pk>/',RecetteIngredientsDetailAPIView.as_view(),name='recette_ingredients_pk'),
@@ -42,4 +44,11 @@ urlpatterns = [
     path('recette_section/<int:pk>/',RecetteSectionDetailAPIView.as_view(),name='recette_section_pk'),
     path('recette_section/',RecetteSectionDetailAPIView.as_view(),name='recette_section'),
     path('duplicate_recette/<int:recette_id>/',DuplicateRecette.as_view(),name='duplicate_recette'),
+    path('fournisseurs/', ForunisseurListAPIView.as_view(),name='fournisseur_list'),
+    path('fournisseur_categories/', FournisseurCategoryView.as_view(),name='fournisseur_category'),
+    path('fournisseur_specialties/', FournisseurSpecialityView.as_view(),name='fournisseur_specialty'),
+    path('fournisseurs/<int:pk>/',FournisseurDetailAPIView.as_view(),name='fournisseurs_detail'),
+    path('produits/',ProduitListAPIView.as_view(),name='produit_list'),
+    path('produits/<int:pk>/',ProduitDetailAPIView.as_view(),name='produit_list'),
+    path('ingredient/produits/<int:ingredient_id>',ProduitsForIngredientsView.as_view(),name='produits_for_ingredient'),
 ]
