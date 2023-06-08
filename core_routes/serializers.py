@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from core_routes.models import *
-from core_routes.helpers.helper_functions import get_recette_ingredient_cost,get_raw_cost_for_recette_instance,get_ht_selling_price,get_ttc_unit_selling_price
+from core_routes.helpers.helper_functions import get_conversion_rate, get_kilogramme_price, get_recette_ingredient_cost,get_raw_cost_for_recette_instance,get_ht_selling_price,get_ttc_unit_selling_price
 
 class AllergenesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,7 +33,7 @@ class IngredientsSerializer(serializers.ModelSerializer):
         model= Ingredients
         fields = '__all__'
 
-class IngredientsGetSerializer(serializers.ModelSerializer):
+class IngredientsListSerializer(serializers.ModelSerializer):
     labels = LabelsSerializer(many=True,read_only=True)
     allergenes = AllergenesSerializer(many=True,read_only=True)
     season = serializers.SerializerMethodField()
@@ -44,7 +44,63 @@ class IngredientsGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredients
         fields = ('id','name', 'description','illustration','labels','allergenes','category','sous_category','season')
+
+class IngredientsDetailSerializer(serializers.ModelSerializer):
+    labels = LabelsSerializer(many=True,read_only=True)
+    allergenes = AllergenesSerializer(many=True,read_only=True)
+    season = serializers.SerializerMethodField()
+    associated_produits = serializers.SerializerMethodField()
+
+    def get_associated_produits(self,instance):
+        produits = Produit.objects.filter(ingredient=instance)
+        return ProduitForIngredientSerializer(produits,many=True).data
+
+
+    def get_season(self, instance):
+        return [instance.is_in_season_january,instance.is_in_season_february,instance.is_in_season_march,instance.is_in_season_april,instance.is_in_season_may,instance.is_in_season_june,instance.is_in_season_july,instance.is_in_season_august,instance.is_in_season_september,instance.is_in_season_october,instance.is_in_season_november,instance.is_in_season_december]
     
+    class Meta:
+        model = Ingredients
+        fields = ('id','name', 'description','illustration','labels','allergenes','category','sous_category','season','associated_produits')
+
+class ProduitForIngredientSerializer(serializers.ModelSerializer):
+    real_unit = serializers.SerializerMethodField()
+    conversion_unit = serializers.SerializerMethodField()
+    labels = LabelsSerializer(read_only=True,many=True)
+    kilogramme_price = serializers.SerializerMethodField()
+    fournisseur_name = serializers.SerializerMethodField()
+
+    def get_fournisseur_name(self,instance):
+        return instance.fournisseur.name
+
+    def get_real_unit(self,instance):
+        return {"unit":instance.unit,"quantity":instance.quantity}
+
+
+    def get_conversion_unit(self,instance):
+            conversion_rate = get_conversion_rate(ingredientId=instance.ingredient.id,unit=instance.unit)
+            conversion_unit = ""
+            conversion_quantity = 0
+            kilogramme_equivalence = 0
+            if conversion_rate:
+                kilogramme_equivalence = float(instance.quantity) * float(conversion_rate)
+                conversion_quantity = kilogramme_equivalence
+                conversion_unit = "kg"
+                if kilogramme_equivalence <0.1:
+                    conversion_quantity = kilogramme_equivalence *1000
+                    conversion_unit = "g"
+            else:
+               return None
+            
+            return {"unit":conversion_unit,"quantity":conversion_quantity}
+            
+    def get_kilogramme_price(self, instance):
+        return get_kilogramme_price(instance.ingredient,instance.unit,instance.quantity,instance.price)
+
+
+    class Meta:
+        model= Produit
+        fields = 'price','fournisseur_name','real_unit','conversion_unit','kilogramme_price','geographic_location','labels'
 
 class RecetteListGetSerializer(serializers.ModelSerializer):
     season = serializers.SerializerMethodField()
@@ -231,7 +287,7 @@ class RecetteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class GetRecetteIngredientSerializer(serializers.ModelSerializer):
-    ingredient = IngredientsGetSerializer()
+    ingredient = IngredientsListSerializer()
     class Meta:
         model = RecetteIngredient
         fields = ('ingredient', 'quantity', 'unit','buying_price')
@@ -241,7 +297,6 @@ class RecetteIngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecetteIngredient
         fields = '__all__'
-
 
 class CreateRecetteIngredientSerializer(serializers.ModelSerializer):
     

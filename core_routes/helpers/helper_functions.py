@@ -131,15 +131,31 @@ def get_raw_cost_for_recette_instance(recette_instance):
         return ingredients_cost 
     
 
-def sous_recette_not_linked_to_recette(recette_id):
-    print("TESTED, recette id:"+str(recette_id)+ ", recette id:"+sous_recette.name)
-    all_excluded_recette_ids = get_all_excluded_recette_ids_downstream([],Recette.objects.get(id=sous_recette.id))
-    print("DOWSTREAM:"+str(all_excluded_recette_ids))
-    all_excluded_recette_ids += get_all_excluded_recette_ids_upstream([],Recette.objects.get(id=sous_recette.id))
-    print("UPSTREAM:"+str(all_excluded_recette_ids))
-    all_excluded_recette_ids_without_self = [i for i in all_excluded_recette_ids if i != sous_recette.id]
-    print("WOITHOT SELF:"+str(all_excluded_recette_ids_without_self))
-    return recette_id not in all_excluded_recette_ids_without_self
+def get_dependencies(recette_id):
+    return get_downstream_depencies(recette_id) | get_upstream_depencies(recette_id)
+
+
+def get_downstream_depencies(recette_id, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(recette_id)
+
+    for neighbor_recette in SousRecette.objects.filter(recette=recette_id).order_by("id"):
+        if neighbor_recette.sous_recette.id not in visited:
+            neighbor_recette_id = neighbor_recette.sous_recette.id
+            get_downstream_depencies(neighbor_recette_id, visited)
+    return visited
+
+def get_upstream_depencies(recette_id, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(recette_id)
+
+    for neighbor_recette in SousRecette.objects.filter(sous_recette=recette_id).order_by("id"):
+        if neighbor_recette.recette.id not in visited:
+            neighbor_recette_id = neighbor_recette.recette.id
+            get_upstream_depencies(neighbor_recette_id, visited)
+    return visited
 
 def get_recette_dependency_list(recette):
     downstream_depedencies = get_downstream_dependencies(recette)

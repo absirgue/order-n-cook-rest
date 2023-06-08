@@ -79,8 +79,11 @@ class SousRecetteListView(APIView):
     def get(self, request, recette_id, format=None):
         recettes = Recette.objects.all()
         list_of_recettes = []
+        dependencies = get_dependencies(recette_id)
+        print("DEPENDENCIES")
+        print(dependencies)
         for recette in recettes:
-            if sous_recette_not_linked_to_recette(recette_id,recette) and recette.unit and recette.quantity and recette_id != recette.id:
+            if recette.quantity and recette.unit and recette.id not in dependencies:
                 list_of_recettes.append(recette)
         serialized_recettes = SousRecetteOptionSerializer(list_of_recettes,many=True)
         return Response(serialized_recettes.data)

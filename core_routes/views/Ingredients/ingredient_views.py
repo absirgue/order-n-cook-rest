@@ -5,7 +5,7 @@ from core_routes.models import *
 from core_routes.serializers import *
 from rest_framework.views import APIView
 from core_routes.helpers.helper_functions import *
-from core_routes.fournisseur_serializers import ProduitForIngredientSerializer
+from core_routes.serializers import ProduitForIngredientSerializer
 
 """
 This file holds all view classes related to the Ingredients model. 
@@ -16,7 +16,7 @@ class IngredientsListAPIView(APIView):
     """
     def get(self, request, format=None):
         ingredients = Ingredients.objects.all()
-        ingredient_serializer = IngredientsGetSerializer(ingredients, many=True)
+        ingredient_serializer = IngredientsListSerializer(ingredients, many=True)
         
         return Response(ingredient_serializer.data)
 
@@ -42,7 +42,7 @@ class IngredientsDetailAPIView(APIView):
 
     def get(self, request, pk, format=None):
         snippet = self.get_object(pk)
-        serializer = IngredientsGetSerializer(snippet)
+        serializer = IngredientsDetailSerializer(snippet)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):

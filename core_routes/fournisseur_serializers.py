@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from core_routes.models import *
-from core_routes.serializers import IngredientsGetSerializer
+from core_routes.serializers import IngredientsListSerializer
 from core_routes.helpers.helper_functions import get_conversion_rate, get_kilogramme_price,get_last_produit_price_tracker
 from core_routes.serializers import LabelsSerializer
 
@@ -26,7 +26,7 @@ class ProduitDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProduitWithIngredientSerializer(serializers.ModelSerializer):
-    ingredient = IngredientsGetSerializer(read_only=True)
+    ingredient = IngredientsListSerializer(read_only=True)
     real_unit = serializers.SerializerMethodField()
     conversion_unit = serializers.SerializerMethodField()
     labels = LabelsSerializer(read_only=True,many=True)
@@ -90,48 +90,6 @@ class ForunisseurSpecialtySerializer(serializers.ModelSerializer):
     class Meta:
         model= FournisseurSpecialty
         fields = '__all__'
-
-class ProduitForIngredientSerializer(serializers.ModelSerializer):
-    real_unit = serializers.SerializerMethodField()
-    conversion_unit = serializers.SerializerMethodField()
-    labels = LabelsSerializer(read_only=True,many=True)
-    kilogramme_price = serializers.SerializerMethodField()
-    fournisseur_name = serializers.SerializerMethodField()
-
-    def get_fournisseur_name(self,instance):
-        return instance.fournisseur.name
-
-    def get_real_unit(self,instance):
-        return {"unit":instance.unit,"quantity":instance.quantity}
-
-
-    def get_conversion_unit(self,instance):
-            conversion_rate = get_conversion_rate(ingredientId=instance.ingredient.id,unit=instance.unit)
-            conversion_unit = ""
-            conversion_quantity = 0
-            kilogramme_equivalence = 0
-            if conversion_rate:
-                kilogramme_equivalence = float(instance.quantity) * float(conversion_rate)
-                conversion_quantity = kilogramme_equivalence
-                conversion_unit = "kg"
-                if kilogramme_equivalence <0.1:
-                    conversion_quantity = kilogramme_equivalence *1000
-                    conversion_unit = "g"
-            else:
-               return None
-            
-            return {"unit":conversion_unit,"quantity":conversion_quantity}
-            
-    def get_kilogramme_price(self, instance):
-        return get_kilogramme_price(instance.ingredient,instance.unit,instance.quantity,instance.price)
-
-
-    class Meta:
-        model= Produit
-        fields = 'price','fournisseur_name','real_unit','conversion_unit','kilogramme_price','geographic_location','labels'
-
-
-
    
 
     

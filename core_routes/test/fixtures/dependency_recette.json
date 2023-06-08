@@ -1,0 +1,72 @@
+[
+    {
+        "model": "core_routes.recette",
+        "pk": 1,
+        "fields":{
+            "name":"Recette 1"
+        }
+    },
+    {
+        "model": "core_routes.recette",
+        "pk": 2,
+        "fields":{
+            "name":"Recette 2"
+        }
+    },
+    {
+        "model": "core_routes.recette",
+        "pk": 3,
+        "fields":{
+            "name":"Recette 3"
+        }
+    },
+    {
+        "model": "core_routes.recette",
+        "pk": 4,
+        "fields":{
+            "name":"Recette 4"
+        }
+    },
+    {
+        "model": "core_routes.recette",
+        "pk": 5,
+        "fields":{
+            "name":"Recette 5"
+        }
+    },
+    {
+        "model": "core_routes.recette",
+        "pk": 6,
+        "fields":{
+            "name":"Recette 6"
+        }
+    },
+    {
+        "model": "core_routes.recette",
+        "pk": 7,
+        "fields":{
+            "name":"Recette 7"
+        }
+    },
+    {
+        "model": "core_routes.recette",
+        "pk": 8,
+        "fields":{
+            "name":"Recette 8"
+        }
+    },
+    {
+        "model": "core_routes.recette",
+        "pk": 9,
+        "fields":{
+            "name":"Recette 9"
+        }
+    },
+    {
+        "model": "core_routes.recette",
+        "pk": 10,
+        "fields":{
+            "name":"Recette 10"
+        }
+    }
+]

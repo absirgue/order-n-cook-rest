@@ -1,0 +1,75 @@
+[
+    {
+        "model": "core_routes.sousrecette",
+        "pk":1,
+        "fields":{
+            "recette": 1,
+            "sous_recette":2,
+            "unit":"kilogramme"
+        }
+       
+    },
+    {
+        "model": "core_routes.sousrecette",
+        "pk":2,
+        "fields":{
+            "recette": 2,
+            "sous_recette":3,
+            "unit":"kilogramme"
+        }
+    },
+    {
+        "model": "core_routes.sousrecette",
+        "pk":3,
+        "fields":{
+            "recette": 2,
+            "sous_recette":4,
+            "unit":"kilogramme"
+        }
+    },
+    {
+        "model": "core_routes.sousrecette",
+        "pk":4,
+        "fields":{
+            "recette": 1,
+            "sous_recette":5,
+            "unit":"kilogramme"
+        }
+    },
+    {
+        "model": "core_routes.sousrecette",
+        "pk":5,
+        "fields":{
+            "recette": 6,
+            "sous_recette":1,
+            "unit":"kilogramme"
+        }
+    },
+    {
+        "model": "core_routes.sousrecette",
+        "pk":6,
+        "fields":{
+            "recette": 7,
+            "sous_recette":6,
+            "unit":"kilogramme"
+        }
+    },
+    {
+        "model": "core_routes.sousrecette",
+        "pk":7,
+        "fields":{
+            "recette": 8,
+            "sous_recette":6,
+            "unit":"kilogramme"
+        }
+    },
+    {
+        "model": "core_routes.sousrecette",
+        "pk":8,
+        "fields":{
+            "recette": 1,
+            "sous_recette":9,
+            "unit":"kilogramme"
+        }
+    }
+]
