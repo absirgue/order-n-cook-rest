@@ -21,11 +21,9 @@ class RecetteListAPIView(APIView):
 
     def post(self, request, format=None):
         serializer = RecetteSerializer(data=request.data)
-        print(request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class RecetteDetailAPIView(APIView):
@@ -39,7 +37,6 @@ class RecetteDetailAPIView(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        print("ACCESSED")
         recette_object = self.get_object(pk)
         recette_serializer = RecetteDetailGetSerializer(recette_object)
         recette_data = recette_serializer.data
@@ -61,13 +58,9 @@ class RecetteDetailAPIView(APIView):
     def put(self, request, pk, format=None):
         snippet = self.get_object(pk)
         serializer = RecetteSerializer(snippet, data=request.data,partial=True)
-        print(request.data)
         if serializer.is_valid():
-            print("VALID")
             serializer.save()
             return Response(RecetteDetailGetSerializer(snippet).data,status=status.HTTP_200_OK)
-        else:
-            print("GROS PB")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
@@ -80,8 +73,6 @@ class SousRecetteListView(APIView):
         recettes = Recette.objects.all()
         list_of_recettes = []
         dependencies = get_dependencies(recette_id)
-        print("DEPENDENCIES")
-        print(dependencies)
         for recette in recettes:
             if recette.quantity and recette.unit and recette.id not in dependencies:
                 list_of_recettes.append(recette)
