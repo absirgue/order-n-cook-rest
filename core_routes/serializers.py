@@ -134,35 +134,22 @@ class RecetteListGetSerializer(serializers.ModelSerializer):
     def get_selling_price(self,instance):
         return_obj = {}
         raw_material_cost = get_raw_cost_for_recette_instance(instance)
-        print("RECETTE CLACULATIOn")
-        print(raw_material_cost)
         ht_cost = get_ht_selling_price(instance,raw_material_cost)
-        print(ht_cost)
         unit_ttc_selling_price = get_ttc_unit_selling_price(instance,ht_cost)
-        print("UNIT SELLING PRICE BEFORE ANYTHING")
-        print(type(unit_ttc_selling_price))
         if unit_ttc_selling_price:
             return_obj["price"] = unit_ttc_selling_price
         else:
             return_obj["price"] = "-"
         if instance.last_selling_price and unit_ttc_selling_price:
-            print("COMPARISON")
-            print(unit_ttc_selling_price)
-            print(instance.last_selling_price)
             if unit_ttc_selling_price < instance.last_selling_price:
               return_obj["evolution"] = "LOWER"
             elif unit_ttc_selling_price > instance.last_selling_price:
                 return_obj["evolution"]= "HIGHER"
             else:
                  return_obj["evolution"]= "SAME"
-        print("UNIT TTC SELLING PRICE:")
-        print(unit_ttc_selling_price)
         if unit_ttc_selling_price:
-            print("EDITING")
             instance.last_selling_price = unit_ttc_selling_price
             instance.save()
-            print("EDTED")
-            print(instance.last_selling_price)
         return return_obj
 
     def get_allergenes(self,instance):

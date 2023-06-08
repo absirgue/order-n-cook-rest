@@ -118,7 +118,6 @@ class IngredientUnits(APIView):
             return Response({'message':'Not enough data provided.'},status=status.HTTP_400_BAD_REQUEST)
         try:
             ingredient = Ingredients.objects.get(id=ingredientId)
-            print(ingredient)
             conversions = [{"unit":"kilogramme","conversion_rate":1}]
             if ingredient.unit != "kilogramme":
                 conversions.append({"unit":ingredient.unit,"conversion_rate":ingredient.conversion_to_kilo})

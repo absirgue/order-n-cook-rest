@@ -39,7 +39,6 @@ class RecetteIngredientsDetailAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def post(self, request, format=None):
-        print(request.data)
         serializer = CreateRecetteIngredientSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -70,7 +69,6 @@ class SousRecettesDetailAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def post(self, request, format=None):
-        print(request.data)
         serializer = SousRecetteSerializer(data=request.data)
         if serializer.is_valid():
                 serializer.save()
@@ -107,7 +105,6 @@ class RecetteProgressionDetailAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def post(self, request, format=None):
-        print(request.data)
         serializer = RecetteProgressionElementSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -127,10 +124,8 @@ class IncrementProgressionElementRank(APIView):
                 progression_element.save()
                 return Response(status=status.HTTP_200_OK) 
             else:
-                print("NO SUCH EL")
                 return Response(status=status.HTTP_406_NOT_ACCEPTABLE) 
         except:
-            print("SOME ERROR")
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE) 
      
 class DecrementProgressionElementRank(APIView):
@@ -174,7 +169,6 @@ class RecetteSectionDetailAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def post(self, request, format=None):
-        print(request.data)
         serializer = RecetteSectionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

@@ -89,9 +89,6 @@ def get_ttc_selling_price(recette,ht_selling_price):
 
 def get_ttc_unit_selling_price(recette,ht_selling_price):
     ttc_selling_price = get_numeric_value_ttc_selling_price(recette,ht_selling_price)
-    print("ttc_selling_price")
-    print(ttc_selling_price)
-    print(recette.quantity)
     if ttc_selling_price and recette.quantity:
         numeric_value = ttc_selling_price / recette.quantity 
         return round(numeric_value, 2)
@@ -111,17 +108,12 @@ def get_raw_cost_from_serialized_recette(serialized_recette):
     return cost
 
 def get_raw_cost_for_recette_instance(recette_instance):
-    print("TESTING FOR")
-    print(recette_instance.name)
     ingredients_cost = 0
     for ingredient in RecetteIngredient.objects.filter(recette=recette_instance):
         cost = get_recette_ingredient_cost(ingredient)
         if cost:
             ingredients_cost+=cost
-    
-    print("iNGREIDENTS COST:" + str(ingredients_cost))
     if SousRecette.objects.filter(recette=recette_instance).exists():
-        print("exists:")
         sous_recette_cost = 0
         for sous_recette in SousRecette.objects.filter(recette=recette_instance):
             # Add notion of share of recette
@@ -174,15 +166,10 @@ def get_all_excluded_recette_ids_downstream(list,recette):
         children = SousRecette.objects.filter(recette=recette).order_by('id')
         for recette in children:
             list = get_all_excluded_recette_ids_downstream(list,recette.sous_recette)
-        print(list)
         list.append(recette.id)
         return list
     else:
-        print("HERE:"+str(list))
-        print("HERE:"+recette.name)
-        print("HERE:"+str(recette.id))
         list.append(recette.id)
-        print("WILL RETURN:"+str(list))
         return list
 
 def get_all_excluded_recette_ids_upstream(list,recette):
@@ -190,13 +177,8 @@ def get_all_excluded_recette_ids_upstream(list,recette):
         children = SousRecette.objects.filter(sous_recette=recette).order_by('id')
         for recette in children:
             list = get_all_excluded_recette_ids_downstream(list,recette.recette)
-        print(list)
         list.append(recette.id)
         return list
     else:
-        print("HERE:"+str(list))
-        print("HERE:"+recette.name)
-        print("HERE:"+str(recette.id))
         list.append(recette.id)
-        print("WILL RETURN:"+str(list))
         return list
