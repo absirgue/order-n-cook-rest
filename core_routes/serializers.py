@@ -69,9 +69,13 @@ class ProduitForIngredientSerializer(serializers.ModelSerializer):
     labels = LabelsSerializer(read_only=True,many=True)
     kilogramme_price = serializers.SerializerMethodField()
     fournisseur_name = serializers.SerializerMethodField()
+    fournisseur_id = serializers.SerializerMethodField()
 
     def get_fournisseur_name(self,instance):
         return instance.fournisseur.name
+
+    def get_fournisseur_id(self,instance):
+        return instance.fournisseur.id
 
     def get_real_unit(self,instance):
         return {"unit":instance.unit,"quantity":instance.quantity}
@@ -100,7 +104,7 @@ class ProduitForIngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model= Produit
-        fields = 'price','fournisseur_name','real_unit','conversion_unit','kilogramme_price','geographic_location','labels'
+        fields = 'id','price','fournisseur_name','fournisseur_id','real_unit','conversion_unit','kilogramme_price','geographic_location','labels'
 
 class RecetteListGetSerializer(serializers.ModelSerializer):
     season = serializers.SerializerMethodField()
@@ -314,7 +318,29 @@ class GetRecettePogressionElementSerializer(serializers.ModelSerializer):
         model = RecetteProgressionElement
         fields = ('ordering','text')
 
-class IngredientOnlyNameSerializer(serializers.ModelSerializer):
+
+class IngredientUnitsAndLabelsSerializer(serializers.ModelSerializer):
+    units = serializers.SerializerMethodField()
+    labels = LabelsSerializer(many=True,read_only=True)
+    def get_units(self,instance):
+        units = ["kilogramme"]
+        if instance.unit != "kilogramme":
+                units.append(instance.unit)
+            
+        try:
+            recorded_conversions = Conversions.objects.filter(ingredient=instance)
+            for conversion in recorded_conversions:
+                units.append(conversion.unit)
+           
+        except:
+            pass
+        return units
+        
+    class Meta:
+        model = Ingredients
+        fields = ('id','name','units','labels')
+
+class IngredientAndUnitsSerializer(serializers.ModelSerializer):
     units = serializers.SerializerMethodField()
 
     def get_units(self,instance):

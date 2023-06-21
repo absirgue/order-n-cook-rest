@@ -7,7 +7,7 @@ from core_routes.views.Recettes.recettes_components import *
 from core_routes.views.Recettes.recettes_views import *
 from core_routes.views.Fournisseurs.fournisseur_views import *
 from core_routes.views.Fournisseurs.fournisseur_components_views import *
-
+from core_routes.views.Commandes.commande_views import *
 
 urlpatterns = [
     path('allergenes/<int:pk>/', AllergenesDetailAPIView.as_view(),name='allergene_detail'),
@@ -23,6 +23,7 @@ urlpatterns = [
     path('conversion_rate/',ConversionIngredient.as_view(),name='conversion_rate'),
     path('kilogram_equivalent/',UnitEquivalence.as_view(),name='kilogram_equivalent'),
     path('all_ingredient_and_units/',IngredientsUnitsListView.as_view(),name='ingredients_unit'),
+    path('all_ingredient_units_and_labels/',IngredientUnitsLabelsListView.as_view(),name='ingredients_unit_labels'),
     path('ingredient_units/<int:ingredientId>/',IngredientUnits.as_view(),name='ingredient_unit'),
     path('recettes/',RecetteListAPIView.as_view(),name='recettes_list'),
     path('recettes/<int:pk>/',RecetteDetailAPIView.as_view(),name='recettes_detail'),
@@ -51,4 +52,6 @@ urlpatterns = [
     path('produits/',ProduitListAPIView.as_view(),name='produit_list'),
     path('produits/<int:pk>/',ProduitDetailAPIView.as_view(),name='produit_list'),
     path('ingredient/produits/<int:ingredient_id>',ProduitsForIngredientsView.as_view(),name='produits_for_ingredient'),
+    path('commandes/',CommandeListAPIView.as_view(),name='commandes_list'),
+    path('fournisseur/order_data/<int:fournisseur_id>/',FournisseurMinimalDetailView.as_view(),name='fournisseur_detail_for_orders')
 ]

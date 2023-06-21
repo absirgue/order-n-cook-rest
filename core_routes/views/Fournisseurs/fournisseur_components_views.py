@@ -47,7 +47,7 @@ class ProduitDetailAPIView(APIView):
         snippet = self.get_object(pk)
         serializer = ProduitDetailSerializer(snippet, data=request.data,partial=True)
         if serializer.is_valid():
-            if request.data["price"]:
+            if "price" in request.data:
                 ProduitPriceTracker.objects.create(produit=snippet,kilogramme_price=get_kilogramme_price(snippet.ingredient,snippet.unit,snippet.quantity,snippet.price))
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)

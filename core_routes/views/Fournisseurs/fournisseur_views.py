@@ -91,4 +91,17 @@ class FournisseurDetailAPIView(APIView):
         snippet = self.get_object(pk)
         snippet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+
+class FournisseurMinimalDetailView(APIView):
+  
+    def get_object(self, fournisseur_id):
+        try:
+            return Fournisseur.objects.get(pk=fournisseur_id)
+        except Fournisseur.DoesNotExist:
+            raise Http404
+
+    def get(self, request, fournisseur_id, format=None):
+        fournisseur_object = self.get_object(fournisseur_id)
+        fournisseur_serializer = FournisseurOrderDetailSerializer(fournisseur_object)
+        return Response(fournisseur_serializer.data)

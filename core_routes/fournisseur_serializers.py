@@ -65,7 +65,7 @@ class ProduitWithIngredientSerializer(serializers.ModelSerializer):
   
     class Meta:
         model= Produit
-        fields = ('id','price','ingredient','real_unit','conversion_unit','kilogramme_price','last_known_price','date_last_known_price','labels')
+        fields = ('id','price','ingredient','real_unit','conversion_unit','kilogramme_price','last_known_price','date_last_known_price','labels','geographic_location')
 
 
 class FournisseurDetailSerializer(serializers.ModelSerializer):
@@ -92,4 +92,7 @@ class ForunisseurSpecialtySerializer(serializers.ModelSerializer):
         fields = '__all__'
    
 
-    
+class FournisseurOrderDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= Fournisseur
+        fields = ('ordering_email','principal_email','ordering_phone_number','principal_phone_number','last_order_time','delivers_monday','delivers_tuesday','delivers_wednesday','delivers_thursday','delivers_friday','delivers_saturday','delivers_sunday')

@@ -97,16 +97,16 @@ class IngredientsUnitsListView(APIView):
     """
     def get(self,request, format=None):
         ingredients = Ingredients.objects.all()
-        ingredient_serializer = IngredientOnlyNameSerializer(ingredients, many=True)
+        ingredient_serializer = IngredientAndUnitsSerializer(ingredients, many=True)
         return Response(ingredient_serializer.data)
     
-class IngredientsUnitsListView(APIView):
+class IngredientUnitsLabelsListView(APIView):
     """
     Get a list of the units available for an ingredient.
     """
     def get(self,request, format=None):
         ingredients = Ingredients.objects.all()
-        ingredient_serializer = IngredientOnlyNameSerializer(ingredients, many=True)
+        ingredient_serializer = IngredientUnitsAndLabelsSerializer(ingredients, many=True)
         return Response(ingredient_serializer.data)
     
 class IngredientUnits(APIView):
