@@ -6,6 +6,7 @@ from core_routes.commande_serializer import *
 from rest_framework.views import APIView
 import random
 import string
+
 """
 This file holds all view classes related to the Commande model. 
 """
@@ -34,7 +35,6 @@ class CommandeListAPIView(APIView):
                 commande_item_serializer = CommandeItemAllFieldsSerializer(data=commande_item)
                 if commande_item_serializer.is_valid():
                     commande_item_serializer.save()
-                    print(commande_item_serializer.data)
                     commande_items.append(commande_item_serializer.data['id'])
                 else:
                     return Response(commande_item_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -51,4 +51,33 @@ class CommandeListAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
+class CommandeDetailAPIView(APIView):
+    """
+    Retrieve, update or delete a snippet a Commande item.
+    """
+    def get_object(self, pk):
+        try:
+            return Commande.objects.get(pk=pk)
+        except Commande.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        commande_object = self.get_object(pk)
+        commande_serializer = CommandeDetailsSerializer(commande_object)
+        return Response(commande_serializer.data)
+
+    def put(self, request, pk, format=None):
+        snippet = self.get_object(pk)
+        serializer = CommandeDetailsSerializer(snippet, data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(CommandeDetailsSerializer(snippet).data,status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        snippet = self.get_object(pk)
+        snippet.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+

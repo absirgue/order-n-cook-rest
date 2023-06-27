@@ -8,6 +8,7 @@ from core_routes.views.Recettes.recettes_views import *
 from core_routes.views.Fournisseurs.fournisseur_views import *
 from core_routes.views.Fournisseurs.fournisseur_components_views import *
 from core_routes.views.Commandes.commande_views import *
+from core_routes.views.Commandes.commande_operations import *
 
 urlpatterns = [
     path('allergenes/<int:pk>/', AllergenesDetailAPIView.as_view(),name='allergene_detail'),
@@ -53,5 +54,9 @@ urlpatterns = [
     path('produits/<int:pk>/',ProduitDetailAPIView.as_view(),name='produit_list'),
     path('ingredient/produits/<int:ingredient_id>',ProduitsForIngredientsView.as_view(),name='produits_for_ingredient'),
     path('commandes/',CommandeListAPIView.as_view(),name='commandes_list'),
+    path('commandes/<int:pk>/',CommandeDetailAPIView.as_view(),name='commande_detail'),
+    path('record_delivery/<int:pk>/',RecordDeliveryAPIView.as_view(),name='record_delivery'),
+    path('create_avoir/<int:pk>/',CreateAvoirAPIView.as_view(),name='create_avoir'),
+    path('receive_avoir/<int:commande_id>/',ReceiveAvoirAPIView.as_view(),name='receive_avoir'),
     path('fournisseur/order_data/<int:fournisseur_id>/',FournisseurMinimalDetailView.as_view(),name='fournisseur_detail_for_orders')
 ]

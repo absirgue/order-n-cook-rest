@@ -212,12 +212,18 @@ class ProduitPriceTracker(models.Model):
 
 class CommandeItem(models.Model):
     produit = models.ForeignKey(Produit,null=False, on_delete=models.CASCADE)
+    unit = models.CharField(max_length=100)
+    unit_quantity = models.DecimalField(max_digits = 7, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
     quantity = models.DecimalField(max_digits = 7, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
-    is_concerned_by_avoir = models.BooleanField(default=False)
+    pending_avoir = models.BooleanField(default=False)
+    received_avoir =  models.BooleanField(default=False)
+    kilogramme_price =  models.DecimalField(max_digits = 7, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
+    unit_price =  models.DecimalField(max_digits = 7, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
 
 class AvoirItem(models.Model):
     item = models.ForeignKey(CommandeItem,null=False, on_delete=models.CASCADE)
     quantity_demanded = models.DecimalField(max_digits = 7, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
+    quantity_received = models.DecimalField(max_digits = 7, decimal_places=2, blank=True,null=True,validators=[MinValueValidator(limit_value=0)])
     reason = models.CharField(max_length=250)
 
 class BonLivraison(models.Model):
@@ -226,7 +232,7 @@ class BonLivraison(models.Model):
         MaxValueValidator(
             limit_value=date.today(),
             message='Date can not be later than today')])
-    total_amount_ht = models.DecimalField(max_digits = 8, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
+    total_amount_ht = models.DecimalField(max_digits = 8, decimal_places=2, blank=True,null=True,validators=[MinValueValidator(limit_value=0)])
 
 class Invoice(models.Model):
     number =  models.CharField(max_length=50,null=False, blank=False)
@@ -246,7 +252,7 @@ class Avoir(models.Model):
     date_received = models.DateField(validators=[
         MaxValueValidator(
             limit_value=date.today(),
-            message='Date can not be later than today')])
+            message='Date can not be later than today')],blank=True,null=True)
     total_amount_ht = models.DecimalField(max_digits = 8, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
     items = models.ManyToManyField(AvoirItem, blank=False) 
 
@@ -278,10 +284,11 @@ class Commande(models.Model):
     bon_livraison = models.ForeignKey(BonLivraison, null=True,blank=True, on_delete=models.SET_NULL) 
     avoir = models.ForeignKey(Avoir, null=True,blank=True, on_delete=models.SET_NULL) 
     invoice = models.ForeignKey(Invoice, null=True,blank=True, on_delete=models.SET_NULL) 
-    # expected_delivery_date = models.DateField(default=None,validators=[
-    #     MaxValueValidator(
-    #         limit_value=date.today(),
-    #         message='Date can not be later than today')])
+    expected_delivery_date = models.DateField(default=None,validators=[
+        MinValueValidator(
+            limit_value=date.today(),
+            message='Date can not be later than today')],blank=True, null=True)
+    concerned_with_avoir = models.BooleanField(default=False)
     ordering_mean = models.CharField(choices=OrderingMeans.choices,max_length=100,blank=False,null=False)
 
 
