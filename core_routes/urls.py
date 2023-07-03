@@ -58,5 +58,6 @@ urlpatterns = [
     path('record_delivery/<int:pk>/',RecordDeliveryAPIView.as_view(),name='record_delivery'),
     path('create_avoir/<int:pk>/',CreateAvoirAPIView.as_view(),name='create_avoir'),
     path('receive_avoir/<int:commande_id>/',ReceiveAvoirAPIView.as_view(),name='receive_avoir'),
-    path('fournisseur/order_data/<int:fournisseur_id>/',FournisseurMinimalDetailView.as_view(),name='fournisseur_detail_for_orders')
+    path('fournisseur/order_data/<int:fournisseur_id>/',FournisseurMinimalDetailView.as_view(),name='fournisseur_detail_for_orders'),
+    path('receive_invoice/<int:commande_id>/',ReceiveInvoiceAPIView.as_view(),name='receive_invoice'),
 ]

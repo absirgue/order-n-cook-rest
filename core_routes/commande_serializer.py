@@ -165,7 +165,7 @@ class CommandeDetailsSerializer(serializers.ModelSerializer):
 
     def get_invoice_details(self, instance):
         if instance.invoice:
-            invoice = Invoice.objects.get(id=instance.invoice)
+            invoice = instance.invoice
             return {"identifier":invoice.number,"date":invoice.date_created,"amount_ht":invoice.total_amount_ht,"total_taxes":invoice.total_taxes}
         else:
             return None
@@ -207,4 +207,9 @@ class AvoirItemSerializer(serializers.ModelSerializer):
 class AvoirSerializer(serializers.ModelSerializer):
     class Meta:
         model = Avoir
+        fields = '__all__'
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invoice
         fields = '__all__'

@@ -241,7 +241,7 @@ class Invoice(models.Model):
             limit_value=date.today(),
             message='Date can not be later than today')])
     total_amount_ht = models.DecimalField(max_digits = 8, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
-    total_taxes = models.DecimalField(max_digits = 8, decimal_places=2, blank=False,validators=[MinValueValidator(limit_value=0)])
+    total_taxes = models.DecimalField(max_digits = 8, decimal_places=2, blank=True,null=True,validators=[MinValueValidator(limit_value=0)])
 
 class Avoir(models.Model):
     number =  models.CharField(max_length=50,null=False, blank=False)

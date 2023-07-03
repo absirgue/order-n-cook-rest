@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  </head>
+  <body style="font-size:14px">
+    <div class="invoice-box" style="width: 100%">
+        <tr class="top">
+          <td>
+            <table>
+              <tr>
+                <td>
+                  {{restaurant_name}}<br />
+                  {{address}}<br />
+                  {{postal_code_and_city}}</br> {{client_name}}
+                </td>
+				{% comment %} <td></td> {% endcomment %}
+				{% comment %} <td></td> {% endcomment %}
+				<td></td>
+                <td>
+                <span style="color:red">DEMANDE D"AVOIR</span><br />
+                  <span style="font-weight:500">Numéro de commande {{commande_number}}</span> <br />
+                  <span style="font-weight:500">Numéro de Bon de Livraison {{bl_number}}</span><br />
+                  {{fournisseur_name}}<br />
+                  {{fournisseur_postal_code_and_city}}<br />
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+		<div class="information" style="padding-top:15px; padding-bottom:15px">
+            <i>Contact Client:</i></br>
+            Adresse email: <span style="font-weight:500">{{restaurant_email}}</span></br>
+			Numéro de téléphone: <span style="font-weight:500">{{restaurant_phone_number}}</span></br>
+		</div>
+        <div class="information" style="padding-top:15px; padding-bottom:15px">
+            <i>Avoir demandé le {{demande_date}} par Éric Bruyelle à l'aide de Order n'Cook.</i></br>
+		</div>
+
+		<table>
+        <tr class="heading" style="background-color:lightgrey;padding-top:3px">
+          <td><i>Quantité Demandée</i></td>
+          <td><i>Unité</i></td>
+          <td><i>Produit</i></td>
+          <td><i>Prix Unitaire</i></td>
+          <td><i>Montant Demandé</i></td>
+          <td><i>Motif</i></td>
+        </tr>
+        {%for item in items%}
+        <tr class="item" style="padding-top:2px;border-top-width:1px">
+          <td  style="font-weight:500">{{item.quantity}}</td>
+          <td  style="font-weight:500">{{item.unit}}</td>
+          <td style="font-weight:500">{{item.produit_name}}</td>
+          <td>{{item.unit_price}}</td>
+          <td style="font-weight:500">{{item.amount}}</td>
+          <td style="font-weight:500">{{item.reason}}</td>
+        </tr>
+        {%endfor%}
+      </table>
+    </div>
+  </body>
+</html>

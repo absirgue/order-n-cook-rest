@@ -6,7 +6,12 @@ from core_routes.commande_serializer import *
 from rest_framework.views import APIView
 import random
 import string
+from core_routes.utils import render_to_pdf
+from django.http import HttpResponse
 
+
+DAYS_OF_THE_WEEK = ["Lundi","Mardi","Mercredi","Jeudi",'Vendredi',"Samedi","Dimanche"]
+MONTHS = ["Janvier","Février","Mars","Avril",'Mai',"Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]
 """
 This file holds all view classes related to the Commande model. 
 """
@@ -47,8 +52,35 @@ class CommandeListAPIView(APIView):
         rest["month"] = MONTH_3_LETTERS[currentMonth-1] + " "+str(currentYear)[-2:]
         serializer = CommandeAllFieldsSerializer(data=rest)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            commande = serializer.save()
+            pdf_items = []
+            for item in commande.items.all():
+                pdf_items.append({'quantity':str(round(item.quantity*item.unit_quantity, 2)),'unit':item.unit,'produit_name':item.produit.ingredient.name,'unit_price':f"{item.unit_price}%s"%(u"\N{euro sign}"),'total_amount':f"{round(item.quantity*item.unit_price, 2)}%s"%(u"\N{euro sign}")})
+            ht_total = 0
+            for item in pdf_items:
+                ht_total += float(item['total_amount'][:-1])
+            ht_total = f"{str(round(ht_total, 2))}%s"%(u"\N{euro sign}")
+            delivery_date = None
+            if commande.expected_delivery_date:
+                delivery_date = f"{DAYS_OF_THE_WEEK[commande.expected_delivery_date.weekday()]} {str(commande.expected_delivery_date.day)} {MONTHS[commande.expected_delivery_date.month-1]}"
+            data = {
+            'restaurant_name': 'Kitchen Ter(r)e',
+            'address': '12 rue Lanneau',
+            'postal_code_and_city': '75005 Paris',
+            'client_name': 'Anton Sirgue',
+            'cde_number':commande.commande_number,
+            'fournisseur_name':commande.fournisseur.name,
+            'fournisseur_postal_code_and_city':'75006 Paris',
+            'expected_delivery_day_and_date':delivery_date,
+            'commande_date':commande.date_created,
+            'ordering_mean':commande.ordering_mean,
+            'restaurant_email':'email@memail.com',
+            'restaurant_phone_number':'0678765645',
+            'items':pdf_items,
+            'ht_total':ht_total
+             }
+            pdf = render_to_pdf('pdfs/commande.html',data)
+            return HttpResponse(pdf, content_type='application/pdf',status=status.HTTP_201_CREATED)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
