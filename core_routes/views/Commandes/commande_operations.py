@@ -12,7 +12,7 @@ from core_routes.utils import render_to_pdf
 from django.http import HttpResponse
 from core_routes.textract import TextractWrapper
 from rest_framework.parsers import FileUploadParser
-
+from core_routes.email import send_avoir_email
 DAYS_OF_THE_WEEK = ["Lundi","Mardi","Mercredi","Jeudi",'Vendredi',"Samedi","Dimanche"]
 MONTHS = ["Janvier","Février","Mars","Avril",'Mai',"Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]
 
@@ -91,23 +91,37 @@ class CreateAvoirAPIView(APIView):
                 demande_date = None
                 if avoir.date_created:
                     demande_date = f"{DAYS_OF_THE_WEEK[avoir.date_created.weekday()]} {str(avoir.date_created.day)} {MONTHS[avoir.date_created.month-1]}"
+                client_email = "absirgue@gmail.com"
+                client_restaurant_name = 'Kitchen Ter(r)e'
+                client_name = 'Anton Sirgue'
                 data = {
-                'restaurant_name': 'Kitchen Ter(r)e',
+                'restaurant_name': client_restaurant_name,
                 'address': '12 rue Lanneau',
                 'postal_code_and_city': '75005 Paris',
-                'client_name': 'Anton Sirgue',
+                'client_name': client_name,
                 'commande_number':commande.commande_number,
                 'bl_number':commande.bon_livraison.number,
                 'fournisseur_name':commande.fournisseur.name,
                 'fournisseur_postal_code_and_city':'75006 Paris',
                 'demande_date':demande_date,
                 'ordering_mean':commande.ordering_mean,
-                'restaurant_email':'email@memail.com',
+                'restaurant_email':client_email,
                 'restaurant_phone_number':'0678765645',
                 'items':pdf_items,
                 }
                 pdf = render_to_pdf('pdfs/avoir.html',data)
-                return HttpResponse(pdf, content_type='application/pdf',status=status.HTTP_201_CREATED)
+                pdf_raw_bytes = pdf.getvalue()   
+               
+                fournisseur_emails = []
+                if commande.fournisseur.principal_email:
+                    fournisseur_emails.append(commande.fournisseur.principal_emai)
+                if commande.fournisseur.ordering_email:
+                    fournisseur_emails.append(commande.fournisseur.ordering_email)
+                if len(fournisseur_emails) > 0:
+                    send_avoir_email(client_email,fournisseur_emails,commande.commande_number,client_restaurant_name,client_name,pdf)
+                else:
+                    return HttpResponse(pdf_raw_bytes, content_type='application/pdf',status=status.HTTP_202_ACCEPTED)
+                return HttpResponse(pdf_raw_bytes, content_type='application/pdf',status=status.HTTP_201_CREATED)
         else:
             return Response({"message":"Wrong status"},status=status.HTTP_400_BAD_REQUEST)
     

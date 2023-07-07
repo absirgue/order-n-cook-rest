@@ -6,9 +6,9 @@ from core_routes.commande_serializer import *
 from rest_framework.views import APIView
 import random
 import string
-from core_routes.utils import render_to_pdf
+from core_routes.utils import render_to_pdf,encode_html
 from django.http import HttpResponse
-
+from core_routes.email import send_order_email
 
 DAYS_OF_THE_WEEK = ["Lundi","Mardi","Mercredi","Jeudi",'Vendredi',"Samedi","Dimanche"]
 MONTHS = ["Janvier","Février","Mars","Avril",'Mai',"Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]
@@ -42,6 +42,7 @@ class CommandeListAPIView(APIView):
                     commande_item_serializer.save()
                     commande_items.append(commande_item_serializer.data['id'])
                 else:
+                    print(commande_item_serializer.errors)
                     return Response(commande_item_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         rest = request.data
         rest["commande_number"] = commande_unique_number
@@ -63,25 +64,35 @@ class CommandeListAPIView(APIView):
             delivery_date = None
             if commande.expected_delivery_date:
                 delivery_date = f"{DAYS_OF_THE_WEEK[commande.expected_delivery_date.weekday()]} {str(commande.expected_delivery_date.day)} {MONTHS[commande.expected_delivery_date.month-1]}"
+            client_name = 'Anton Sirgue'
+            client_email = "asbirgue@gmail.com"
+            client_restaurant_name = "Kitchen Ter(r)e"
             data = {
-            'restaurant_name': 'Kitchen Ter(r)e',
+            'restaurant_name': client_restaurant_name,
             'address': '12 rue Lanneau',
             'postal_code_and_city': '75005 Paris',
-            'client_name': 'Anton Sirgue',
+            'client_name': client_name,
             'cde_number':commande.commande_number,
             'fournisseur_name':commande.fournisseur.name,
             'fournisseur_postal_code_and_city':'75006 Paris',
             'expected_delivery_day_and_date':delivery_date,
             'commande_date':commande.date_created,
             'ordering_mean':commande.ordering_mean,
-            'restaurant_email':'email@memail.com',
+            'restaurant_email':client_email,
             'restaurant_phone_number':'0678765645',
             'items':pdf_items,
             'ht_total':ht_total
              }
             pdf = render_to_pdf('pdfs/commande.html',data)
-            return HttpResponse(pdf, content_type='application/pdf',status=status.HTTP_201_CREATED)
-            
+            pdf_raw_bytes = pdf.getvalue()   
+            if commande.ordering_mean == "Commandée par mail":
+                if commande.fournisseur.ordering_email:
+                    
+                    send_order_email(client_email,commande.fournisseur.ordering_email,commande.commande_number,commande.fournisseur.name,client_restaurant_name,client_name,pdf,request.data['email_note'])
+                else:
+                    return HttpResponse(pdf_raw_bytes, content_type='application/pdf',status=status.HTTP_202_ACCEPTED)
+            return HttpResponse(pdf_raw_bytes, content_type='application/pdf',status=status.HTTP_201_CREATED)
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -112,4 +123,3 @@ class CommandeDetailAPIView(APIView):
         snippet = self.get_object(pk)
         snippet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
