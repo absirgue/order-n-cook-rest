@@ -33,6 +33,7 @@ class Ingredients(models.Model):
     name = models.CharField(max_length=120, blank=False)
     description = models.TextField(blank= True)
     illustration = models.FileField(upload_to='ingredients/',blank=True)
+    latest_kilogramme_price = models.DecimalField(max_digits = 7, decimal_places=2, blank=True,null=True,validators=[MinValueValidator(limit_value=0)])
     labels = models.ManyToManyField(Labels,blank= True)
     allergenes = models.ManyToManyField(Allergenes,blank= True)
     conversion_to_kilo = models.DecimalField(max_digits = 12, decimal_places=7, default=1,validators=[MinValueValidator(limit_value=0)],blank= True)

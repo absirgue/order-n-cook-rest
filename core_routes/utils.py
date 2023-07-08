@@ -10,9 +10,6 @@ def render_to_pdf(template_src, context_dict={}):
     result = BytesIO()
     pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
     if not pdf.err:
-        print(result)
-        print("\n\n\n\n\nVALUE:\n")
-        print(result.getvalue())
         return result
     return None
 
@@ -20,8 +17,5 @@ def encode_html(html):
     result = BytesIO()
     pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
     if not pdf.err:
-        print(result)
-        print("\n\n\n\n\nVALUE:\n")
-        print(result.getvalue())
         return result.getvalue()   
     return None

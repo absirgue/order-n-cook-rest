@@ -87,7 +87,7 @@ class CreateAvoirAPIView(APIView):
                     commande_item = avoir_item.item
                     commande_item.pending_avoir = True
                     commande_item.save()
-                    pdf_items.append({'quantity':str(round(avoir_item.quantity_demanded*avoir_item.item.unit_quantity, 2)),'unit':avoir_item.item.unit,'produit_name':avoir_item.item.produit.ingredient.name,'unit_price':f"{avoir_item.item.unit_price}%s"%(u"\N{euro sign}"),'amount':f"{round(avoir_item.item.unit_price*avoir_item.quantity_demanded,2)}%s"%(u"\N{euro sign}"),'reason':avoir_item.reason})  
+                    pdf_items.append({'quantity':str(round(avoir_item.quantity_demanded, 2)),'unit':f"{avoir_item.item.unit_quantity} {avoir_item.item.unit}",'produit_name':avoir_item.item.produit.ingredient.name,'unit_price':f"{avoir_item.item.unit_price}%s"%(u"\N{euro sign}"),'amount':f"{round(avoir_item.item.unit_price*avoir_item.quantity_demanded,2)}%s"%(u"\N{euro sign}"),'reason':avoir_item.reason})  
                 demande_date = None
                 if avoir.date_created:
                     demande_date = f"{DAYS_OF_THE_WEEK[avoir.date_created.weekday()]} {str(avoir.date_created.day)} {MONTHS[avoir.date_created.month-1]}"
@@ -162,10 +162,7 @@ class ReceiveAvoirAPIView(APIView):
                 for item in avoir.items.all():
                     total_amount += item.item.unit_price *item.quantity_received
                 avoir.total_amount_ht = total_amount
-                print("HHHHICNEJCNE")
-                print(total_amount)
                 commande.estimated_ht_total_cost = commande.estimated_ht_total_cost - total_amount
-                print(commande.estimated_ht_total_cost)
                 commande.save()
                 avoir.save()
                 return Response(status=status.HTTP_200_OK)
@@ -187,18 +184,11 @@ class ReceiveInvoiceAPIView(APIView):
         commande = self.get_object(commande_id)
         if commande.status =="WAITING_INVOICE" or commande.status =="AVOIR_RECEIVED_WAITING_INVOICE":
             try: 
-                print(request)
-                print(request.data)
                 file_obj = request.data['file']
-                print("FILE OBJECT GOOD")
                 commande = self.get_object(commande_id)
-                print("COMMANDE GOOD")
                 result = TextractWrapper().analyze_file(commande,file_obj)
-                print("RESULKT")
                 return Response(result,status=status.HTTP_200_OK)
             except Exception as e:
-                print("IN HERE")
-                print(e)
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"message":"Wrong status"},status=status.HTTP_400_BAD_REQUEST)
@@ -242,7 +232,6 @@ class ReceiveInvoiceAPIView(APIView):
             return False
     
     def update_commande_items(self, data):
-        print(data)
         for item in self.clean_request_data_items(data):
             try: 
                 item_obj = CommandeItem.objects.get(id=item['id'])
@@ -265,7 +254,12 @@ class ReceiveInvoiceAPIView(APIView):
                 produit = item_obj.produit
                 produit_serializer = ProduitSerializer(produit,data=produit_changes,partial=True)
                 if produit_serializer.is_valid():
-                    produit_serializer.save()
+                    produit = produit_serializer.save()
+                    try:
+                        produit.ingredient.latest_kilogramme_price = get_kilogramme_price(produit.ingredient,produit.unit,produit.quantity,produit.price)
+                        produit.ingredient.save()
+                    except:
+                        return False
                 else:
                     print(commande_item_serializer.errors)
                     return False

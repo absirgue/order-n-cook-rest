@@ -87,7 +87,16 @@ class RecetteProgressionDetailAPIView(APIView):
             raise Http404
 
     def put(self, request, pk, format=None):
+        print(request.data)
         snippet = self.get_object(pk)
+        if 'section' in request.data:
+            section_items = RecetteProgressionElement.objects.filter(section= request.data['section']).order_by('rank')
+            if len(section_items) >0:
+                max_rank = section_items[len(section_items)-1].rank
+            else:
+                max_rank =0
+            request.data['rank'] = max_rank +1
+            print(request.data)
         serializer = RecetteProgressionElementUpdateSerializer(snippet, data=request.data,partial=True)
         if serializer.is_valid():
             serializer.save()

@@ -46,7 +46,7 @@ def get_kilogramme_price(ingredient,unit,quantity,price):
         kilogramme_equivalence = float(quantity) * float(conversion_rate)
                 
     if kilogramme_equivalence == 0 :
-            return "X"
+            return "-"
     else:
         return round(float(price) / kilogramme_equivalence, 2)
     
@@ -57,13 +57,17 @@ def get_recette_ingredient_cost(recette_ingredient):
         produits_for_ingredient = Produit.objects.filter(ingredient=recette_ingredient.ingredient)
         if produits_for_ingredient:
             needed_quantity_in_kg = float(get_conversion_rate(recette_ingredient.ingredient.id,recette_ingredient.unit))*float(recette_ingredient.quantity)
-            min_cost = 1000000000
-            for produit in produits_for_ingredient :
-                kg_price = get_kilogramme_price(recette_ingredient.ingredient,produit.unit,produit.quantity,produit.price)
-                cost = kg_price*needed_quantity_in_kg
-                if  cost< min_cost:
-                    min_cost = cost
-            return min_cost 
+            
+            if recette_ingredient.ingredient.latest_kilogramme_price:
+                return float(recette_ingredient.ingredient.latest_kilogramme_price)
+            else:
+                max_cost = 0
+                for produit in produits_for_ingredient :
+                    kg_price = get_kilogramme_price(recette_ingredient.ingredient,produit.unit,produit.quantity,produit.price)
+                    cost = kg_price*needed_quantity_in_kg
+                    if  cost> max_cost:
+                        max_cost = cost
+                return max_cost 
         else:
             return None
 

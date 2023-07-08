@@ -21,6 +21,10 @@ def send_avoir_email(client_email,fournisseur_email,order_number,client_restaura
             
 
 def send_email_with_attachment(message, subject, recipient_list,client_restaurant_name,attachment,client_email,attachment_name):
+    print(settings.EMAIL_HOST)
+    print(settings.EMAIL_PORT)
+    print(settings.EMAIL_HOST_USER)
+    print(settings.EMAIL_HOST_PASSWORD)
     with get_connection(  
             host=settings.EMAIL_HOST, 
             port=settings.EMAIL_PORT,  

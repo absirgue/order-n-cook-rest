@@ -65,7 +65,6 @@ class TextractWrapper:
                 "Alias": f"{item.id}_{self.ITEM_UNIT_SUFFIX}",
                 "Pages":["*"]
             })
-        print({"Queries":queries})
         return {"Queries":queries}
         
     def analyze_file(
@@ -73,8 +72,6 @@ class TextractWrapper:
         response = self.client.analyze_document(Document={'Bytes': document_bytes.file.read()},FeatureTypes = ['QUERIES'],QueriesConfig=self.generate_queries(commande))
         question_blocks = self.extract_question_blocks(response)
         answer_blocks = self.extract_answer_blocks(response)
-        print(question_blocks)
-        print(answer_blocks)
         data = {}
         data['total_ht'] = self.get_answer_for_alias_with_number_extraction(question_blocks,answer_blocks,self.INVOICE_TOTAL_HT_ALIAS)
         data['invoice_number'] = self.get_answer_for_alias(question_blocks,answer_blocks,self.INVOICE_NUMBER_ALIAS)
@@ -82,11 +79,7 @@ class TextractWrapper:
         data['total_ttc'] = self.get_answer_for_alias_with_number_extraction(question_blocks,answer_blocks,self.INVOICE_TOTAL_TTC_ALIAS)
         invoice_items = []
         for item in commande.items.all():
-            print("READING FOR")
-            print(item)
             if item:
-                print("ITEM")
-                print(item)
                 invoice_items.append(self.extract_item(item,question_blocks,answer_blocks))
         data['items'] = invoice_items
         return data
@@ -112,11 +105,7 @@ class TextractWrapper:
         answer_id = self.get_answer_id_for_alias(questions, alias)
         for answer in answers:
             if answer['Id'] and  answer['Id'] == answer_id:
-                print("IN THE THINGY")
-                print(type(answer['Text']))
-                print(answer['Text'])
                 try:
-                    print("".join(re.findall("(?:^|[^\d,.])\d+(?:[,.]\d+)?(?:$|[^\d,.])",answer['Text'].replace(" ",""))))
                     return {'answer':float("".join(re.findall("(?:^|[^\d,.])\d+(?:[,.]\d+)?(?:$|[^\d,.])",answer['Text'].replace(" ",""))).replace(",",".")),'confidence':answer['Confidence']}
                 except Exception as e:
                     return {'answer':answer['Text'],'confidence':answer['Confidence']}
@@ -132,25 +121,13 @@ class TextractWrapper:
                     return {'answer':answer['Text'],'confidence':answer['Confidence']}
 
     def extract_item(self, item, questions, answers):
-        print("IN HERE")
-        print(item)
-        print("--------------")
-        print(f"name {item.produit.ingredient.name}")
-        print(f" ID: {item.id}")
         item_data = {'id':item.id,'name':item.produit.ingredient.name,'unit':item.unit}
         unit = self.get_answer_for_alias(questions,answers,f"{item.id}_{self.ITEM_UNIT_SUFFIX}")
         unit_price = self.get_answer_for_alias_with_number_extraction(questions,answers,f"{item.id}_{self.ITEM_UNIT_PRICE_SUFFIX}")
         quantity = self.get_answer_for_alias_with_number_extraction(questions,answers,f"{item.id}_{self.ITEM_QUANTITY_SUFFIX}")
-        print(f"READ UNIT {unit}")
-        print(f"READ Q {quantity}")
-        print(f"READ UNIT P {unit_price}")
-        print(f"WRITING TO {item_data}")
-        print(type(item_data))
         same_unit = True
         if unit:
-            print("ENTERED FIRSt")
             if self.units_are_same(unit['answer'],item.unit) or unit['confidence']<45:
-                print("NOT IF ST")
                 item_data['unit_is_same']=True
                 if unit_price:
                     item_data['unit_price']=unit_price
@@ -163,44 +140,30 @@ class TextractWrapper:
             else:
                 same_unit = False
         else:
-            print("IN ELSE")
             same_unit = False    
         if not same_unit:
-            print("NOT SAME")
             item_data['unit_is_same']=False
             if unit_price:
                 item_data['unit_price']=unit_price
-                print("IN")
             else: 
                 item_data['unit_price'] = {}
-            print("IF 1")
             if quantity:
                 item_data['quantity']=quantity
-                print("IN 1")
                 item_data['quantity']['answer']/= float(item.unit_quantity)
-                print("IN 2")
             else: 
                 item_data['quantity'] = {}
-            print("IF 2")
             item_data['unit_quantity']=item.unit_quantity
-            print("3")
             ingredient = item.produit.ingredient
-            print("4")
             possible_units = ["kilogramme"]
-            print("5")
             if ingredient.unit != "kilogramme":
                 possible_units.append(ingredient.unit)
-                print("IN")
-            print("6")
             try:
                 recorded_conversions = Conversions.objects.filter(ingredient=ingredient)
                 for conversion in recorded_conversions:
                     possible_units.append(conversion.unit)
             except Exception as e:
                 print(f"Error generating units list: {e}")
-            print("LA")
             item_data['possible_units']=possible_units
-            print("7")
         return item_data
     
     def units_are_same(self, unit_1, unit_2):
