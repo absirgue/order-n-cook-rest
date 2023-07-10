@@ -174,7 +174,6 @@ class RecetteListGetSerializer(serializers.ModelSerializer):
         fields = ('id','name', 'quantity','unit','genres','is_to_modify','category','tastes','selected_for_menu','selected_for_next_menu','season','selling_price','allergenes')
 
 class RecetteDetailGetSerializer(serializers.ModelSerializer):
-    season = serializers.SerializerMethodField()
     allergenes = serializers.SerializerMethodField()
     ingredients = serializers.SerializerMethodField()
     sous_recette = serializers.SerializerMethodField()
@@ -210,32 +209,6 @@ class RecetteDetailGetSerializer(serializers.ModelSerializer):
             progression_sections.append({"id":section.id,"name":section.name,"number":section.number})
         return progression_sections
 
-    def get_season(self,instance):
-        if instance.season_start and instance.season_end:
-            months = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]
-            season = []
-            index_season_start = months.index(instance.season_start.lower())
-            index_season_end = months.index(instance.season_end.lower())
-            if index_season_start > index_season_end:
-                for i in range (12, index_season_start-2,-1):
-                    season.append(True)
-                for i in range (index_season_start-1, index_season_end,-1):
-                    season.append(False)
-                for i in range (index_season_end-1, 0,-1):
-                    season.append(True)
-            else:
-                for i in range (0, index_season_start):
-                    season.append(False)
-                for i in range (index_season_start, index_season_end+1):
-                    season.append(True)
-                for i in range (index_season_end+1, 12):
-                    season.append(False)
-            return season
-        else:
-            return None
-    
-
-    
     def get_allergenes(self,instance):
         instance_ingredients = RecetteIngredient.objects.filter(recette=instance)
         allergenes = []
@@ -251,7 +224,7 @@ class RecetteDetailGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recette
-        fields = ('id','ingredients','sous_recette','sections','progression_elements','name', 'tva','coefficient','quantity','unit','genres','category','tastes','duration','temperature','sous_vide_pression','sous_vide_soudure','selected_for_menu','selected_for_next_menu','season','is_to_modify','allergenes')
+        fields = ('id','ingredients','sous_recette','sections','progression_elements','name', 'tva','coefficient','quantity','unit','genres','category','tastes','duration','temperature','sous_vide_pression','sous_vide_soudure','selected_for_menu','selected_for_next_menu','is_to_modify','allergenes','season_start','season_end')
 
 
 class RecetteCategorySerializer(serializers.ModelSerializer):
@@ -412,5 +385,5 @@ class GetSousRecetteSerializer(serializers.ModelSerializer):
 class RecetteProgressionElementUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecetteProgressionElement
-        fields = ('text','section','recette','text')
+        fields = ('text','section','recette','text','rank')
  

@@ -255,8 +255,10 @@ class ReceiveInvoiceAPIView(APIView):
                 produit_serializer = ProduitSerializer(produit,data=produit_changes,partial=True)
                 if produit_serializer.is_valid():
                     produit = produit_serializer.save()
+                    print(f"got KG Price:{produit}")
                     try:
                         produit.ingredient.latest_kilogramme_price = get_kilogramme_price(produit.ingredient,produit.unit,produit.quantity,produit.price)
+                        print(f"got KG Price:{produit.ingredient.latest_kilogramme_price}")
                         produit.ingredient.save()
                     except:
                         return False

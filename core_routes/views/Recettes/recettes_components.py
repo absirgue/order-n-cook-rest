@@ -89,19 +89,32 @@ class RecetteProgressionDetailAPIView(APIView):
     def put(self, request, pk, format=None):
         print(request.data)
         snippet = self.get_object(pk)
+        current_section = snippet.section
+        current_rank = snippet.rank
         if 'section' in request.data:
-            section_items = RecetteProgressionElement.objects.filter(section= request.data['section']).order_by('rank')
-            if len(section_items) >0:
-                max_rank = section_items[len(section_items)-1].rank
-            else:
-                max_rank =0
-            request.data['rank'] = max_rank +1
-            print(request.data)
+            request.data['rank'] = self.get_rank_in_new_section(request.data['section'])
         serializer = RecetteProgressionElementUpdateSerializer(snippet, data=request.data,partial=True)
         if serializer.is_valid():
             serializer.save()
+            self.update_rank_in_old_section(current_section,current_rank)
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get_rank_in_new_section(self, section_id):
+        section_items = RecetteProgressionElement.objects.filter(section= section_id).order_by('rank')
+        print(section_items)
+        if len(section_items) >0:
+            max_rank = section_items[len(section_items)-1].rank
+            print(f"max rank bcs there was: {max_rank}")
+        else:
+            max_rank =0
+        return max_rank + 1
+
+    def update_rank_in_old_section(self,section,rank):
+        following_elements = RecetteProgressionElement.objects.filter(section=section).filter(rank__gt =rank)
+        for element in following_elements:
+            element.rank -=1
+            element.save()
 
     def delete(self, request, pk, format=None):
         snippet = self.get_object(pk)
